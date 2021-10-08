@@ -1,0 +1,5 @@
+# Example config file
+# Copy to the boot partition if you want to change the eye or cheek colour
+
+eyecolour: #002080
+cheekcolour: #7f0002 
