@@ -20,7 +20,7 @@
 #include "eyeconfig.h"
 
 
-// SynthOS 1.00
+// SynthOS 1.01
 PanelBitmap initimg = {
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
     0b11110111, 0b11111101, 0b11110111, 0b11111101, 
@@ -29,11 +29,11 @@ PanelBitmap initimg = {
     0b01001001, 0b01010101, 0b01001001, 0b01010101, 
     0b11001001, 0b01010101, 0b11001001, 0b01010101, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-    0b11101101, 0b01110111, 0b11101101, 0b01110111, 
-    0b10101001, 0b01010101, 0b10101001, 0b01010101, 
-    0b10101101, 0b01010101, 0b10101101, 0b01010101, 
-    0b10100101, 0b01010101, 0b10100101, 0b01010101, 
-    0b11101101, 0b01110111, 0b11101101, 0b01110111, 
+    0b10100100, 0b00100010, 0b10100100, 0b00100010, 
+    0b10101100, 0b01010110, 0b10101100, 0b01010110, 
+    0b10100100, 0b01010010, 0b10100100, 0b01010010, 
+    0b10100100, 0b01010010, 0b10100100, 0b01010010, 
+    0b01000101, 0b00100010, 0b01000101, 0b00100010, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
     0b00001101, 0b10101000, 0b01010111, 0b11010111, 
     0b00001001, 0b00101000, 0b00100101, 0b01010010, 
@@ -63,7 +63,8 @@ extern STATES states[];
 
 static char serialState=0;
 
-uint LED_PIN = 0;
+int LED_PIN = 0;
+int ACK_COUNT = ACK_COUNT_DEFAULT;
 
 uint32_t eyeColour = (EYECOLOUR_RED<<16)|(EYECOLOUR_GREEN<<8)|EYECOLOUR_BLUE;
 uint32_t cheekColour = (BLUSHCOLOUR_RED<<16)|(BLUSHCOLOUR_GREEN<<8)|BLUSHCOLOUR_BLUE;
@@ -121,6 +122,13 @@ int main(int argc, char *argv[]) {
 			printf("Opened serial for reception\n");
 		}
 	}
+
+	// If we're the receiver, set up pin 40 as the ACK LED
+	if(!transmitter) {
+		LED_PIN = 29; // GPIO21, physical pin 40
+		pinMode(LED_PIN, OUTPUT);
+	}
+
 
 	panel->update_nomirror(initimg, colour);
 	for(int ctr=0;ctr<2000;ctr++) {
@@ -210,7 +218,8 @@ void transmit(char code) {
 
 
 //
-//  Default handler for Arduino, can be replaced for other platfirms
+//  Default handler for Arduino, can be replaced for other platforms
+//  This also implements the Receiver functionality when using two Pis
 //
 
 bool checkExpression(STATES *state) {
@@ -261,11 +270,14 @@ return (random() % highest) + lowest;
 }
 
 void initPin(int pin) {
+	pinMode(pin,INPUT);
 	pullUpDnControl(pin,PUD_UP);
 }
 
 void setPin(int pin, bool state) {
-	digitalWrite(pin,state);
+	if(pin >= 0) {
+		digitalWrite(pin,state);
+	}
 }
 
 //
@@ -291,6 +303,7 @@ void parse(const char *line) {
 char buf[1024];
 char *cmd;
 char *param;
+int temp;
 
 if(line[0] == '#') {
 	return;
@@ -310,14 +323,32 @@ if(!strcasecmp(cmd,"eyecolour:")) {
 	eyeColour = parseColour(param);
 	printf("Set eye colour to 0x%06x\n",eyeColour);
 }
-
+if(!strcasecmp(cmd,"eyecolor:")) {
+	eyeColour = parseColour(param);
+	printf("Set eye color to 0x%06x\n",eyeColour);
+}
 if(!strcasecmp(cmd,"blushcolour:")) {
 	cheekColour = parseColour(param);
 	printf("Set cheek colour to 0x%06x\n",cheekColour);
 }
+if(!strcasecmp(cmd,"blushcolor:")) {
+	cheekColour = parseColour(param);
+	printf("Set cheek color to 0x%06x\n",cheekColour);
+}
 if(!strcasecmp(cmd,"cheekcolour:")) {
 	cheekColour = parseColour(param);
 	printf("Set cheek colour to 0x%06x\n",cheekColour);
+}
+if(!strcasecmp(cmd,"cheekcolor:")) {
+	cheekColour = parseColour(param);
+	printf("Set cheek color to 0x%06x\n",cheekColour);
+}
+if(!strcasecmp(cmd,"ackCount:")) {
+	temp = atoi(param);
+	if(temp > 0 ) {
+		ACK_COUNT = temp;
+		printf("Set status LED delay to %d ticks\n",ACK_COUNT);
+	}
 }
 
 

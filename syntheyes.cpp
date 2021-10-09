@@ -14,7 +14,8 @@
 
 // SynthOS 1.00
 extern PanelBitmap initimg;
-extern uint LED_PIN;
+extern int LED_PIN;
+extern int ACK_COUNT;
 PanelDriver *panel;
 NeopixelDriver *statuslights;
 MicDriver *adc;
@@ -37,7 +38,6 @@ extern bool transmitter;
 #define MIN_DELAY    5   // Minimum delay between blinks
 #define MAX_DELAY    250 // Maximum delay between blinks
 #define STATUS_DIVIDER 16  // This controls the speed of the status light chaser, bigger is slower
-#define ACK_COUNT 4
 
 #define STEPS (STATUSPIXELS*2)
 
@@ -68,7 +68,9 @@ int random(int lowest, int highest);
 
 int eyeptr=0;
 int frameidx=0;
+int overlayidx=0;
 signed char *eyeanim;
+signed char *overlayanim;
 int eyemax = 0;
 int waittick=0;
 int state=0;
@@ -102,14 +104,14 @@ EyeBitmap blushbuffer;
 // Add any new animation triggers here
 
 struct STATES states[] = {
-{BLINK,     closeeye,    sizeof(closeeye), 0, 			'B'},
-{WINK,      closeeye,    sizeof(closeeye), 0,		 	'W'},
-{ROLLEYE,   rolleye,     sizeof(rolleye),  EYEROLL_PIN, 	'R'},
-{STARTLED,  startled,    sizeof(startled), STARTLED_PIN, 	'S'},
-{ANNOYED,   annoyed,     sizeof(annoyed),  ANNOYED_PIN, 	'A'},
-{BLUSHING,  blushing,    sizeof(blushing), BLUSHING_PIN, 	'L'},
-{OWO,       owo,       	 sizeof(owo),      OWO_PIN,		'O'},
-{FAULT,     fault,       sizeof(fault),    FAULT_PIN,		'F'},
+{BLINK,     closeeye,    sizeof(closeeye), NULL,		0, 		'B'},
+{WINK,      closeeye,    sizeof(closeeye), NULL,		0,	 	'W'},
+{ROLLEYE,   rolleye,     sizeof(rolleye),  NULL,		EYEROLL_PIN, 	'R'},
+{STARTLED,  startled,    sizeof(startled), NULL,		STARTLED_PIN, 	'S'},
+{ANNOYED,   annoyed,     sizeof(annoyed),  NULL,		ANNOYED_PIN, 	'A'},
+{BLUSHING,  blushing,    sizeof(blushing), ovl_blushing,	BLUSHING_PIN, 	'L'},
+{OWO,       owo,       	 sizeof(owo),      NULL,		OWO_PIN,	'O'},
+{FAULT,     fault,       sizeof(fault),    ovl_fault,		FAULT_PIN,	'F'},
 // DO NOT REMOVE THIS LAST LINE!
 {0,         NULL,        0,                0,			0}  
 };
@@ -117,6 +119,7 @@ struct STATES states[] = {
 
 void initSynthEyes() {
   eyeanim = &closeeye[0];
+  overlayanim = NULL;
   eyemax = sizeof(closeeye);
   state = BLINK;
 
@@ -194,6 +197,9 @@ void loopSynthEyes() {
     }
 
     frameidx=eyeanim[eyeptr];
+    if(overlayanim) {
+        overlayidx = overlayanim[eyeptr];
+    }
   }
   
   // Handle blinking
@@ -229,6 +235,7 @@ void getNextAnim() {
   for(ctr=0;states[ctr].anim;ctr++) {
     if(states[ctr].id == nextstate) {
       eyeanim = states[ctr].anim;
+      overlayanim = states[ctr].overlay;
       eyemax = states[ctr].animlen;
       if(state != BLINK) {
           transmit(states[ctr].code);
@@ -265,8 +272,8 @@ void getSprite(unsigned char *ptr, int blinkpos) {
     memset(framebuffer,0,blinkpos * 2);
   }
 
-  if(state == BLUSHING) {
-	memcpy(blushbuffer,blush[1],32);
+  if(overlayanim) {
+	memcpy(blushbuffer,overlay[overlayidx],32);
   } else {
 	memset(blushbuffer,0,32);
   }
@@ -287,7 +294,10 @@ void wait(int ms, bool interruptable) {
 		if(state == WAITING) {
 			for(int ctr2=0;states[ctr2].anim;ctr2++) {
 				if(checkExpression(&states[ctr2])) {
-					ack=ACK_COUNT;
+					// Flash the status LED, but only if we're not doing a blink
+					if(states[ctr2].id != BLINK && states[ctr2].id != WINK) {
+						ack=ACK_COUNT;
+					}
 					nextstate = states[ctr2].id;
 						if(interruptable) {
 						waittick=0;

@@ -5,6 +5,24 @@ A more advanced eye display for Raspberry Pi and Pico
 V1.00 - Initial PUT
 
 
+V1.01 - Improved blushing/overlay support, status LED on pins 39 and 40, enable all expressions for Xerian
+
+        In v1.01, the following pin assignments are used on the Pi version, which rationalises things a bit better:
+
+                Pin 40 - Startled (Xerian) or OwO (Arthi)
+                Pin 38 - "Fault" - blinking X-eyes (both characters)
+                Pin 37 - Blushing - (both characters)
+                Pin 36 - Annoyed - (both characters)
+                Pin 33 - Eye roll (Xerian only)
+
+                In addition, an LED can be soldered between pins 39 and 40 of the Receiver, which will flash to
+                indicate to the wearer that an expression change has been selected.
+                Make sure the short leg (-ve) is connected to pin 39 (Ground) or it won't work
+
+                The status LED duration can be overridden in eyeconfig.txt,
+                e.g. "ackcount: 2"  ...the default value is 4.
+
+
 The Pico drivers use some code from the Pico examples, which are 3-clause BSD licensed.
 
 Makefiles are provided for the Pico with Hub08 driver, and the Pi with a Unicorn Hat HD driver.

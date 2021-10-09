@@ -8,6 +8,8 @@
 #define IMAGES_XERIAN
 //#define IMAGES_ARTHI
 
+// Duration of acknowledgement LED
+#define ACK_COUNT_DEFAULT 4
 
 // RGB triplets for the eye colour, default to yellow-red (#bf3f00)
 #define EYECOLOUR_RED   0xff // bf
