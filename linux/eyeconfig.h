@@ -42,6 +42,8 @@
 #define BLUSHING_PIN 25 // GPIO26
 #define OWO_PIN 0
 #define FAULT_PIN 0
+#define HAPPY_PIN 0
+
 #define STATUS_PIN 0
 #define VOICE_PIN 0
 

@@ -48,23 +48,12 @@ extern void drawEyeR();
 void getSprite(unsigned char *ptr, int blinkpos);
 void wait(int ms, bool interruptable);
 void getNextAnim();
-bool checkExpression(STATES *state);
+extern bool checkExpression(STATES *state);
+extern void gotExpression(STATES *state);
 void statusCycle(unsigned char r, unsigned char g, unsigned char b);
 
 void randomSeed(unsigned int r);
 int random(int lowest, int highest);
-
-// System state variables
-
-#define WAITING -1
-#define BLINK 0
-#define WINK 1
-#define ROLLEYE 2
-#define STARTLED 3
-#define ANNOYED 4
-#define BLUSHING 5
-#define FAULT 6
-#define OWO 7
 
 int eyeptr=0;
 int frameidx=0;
@@ -112,8 +101,9 @@ struct STATES states[] = {
 {BLUSHING,  blushing,    sizeof(blushing), ovl_blushing,	BLUSHING_PIN, 	'L'},
 {OWO,       owo,       	 sizeof(owo),      NULL,		OWO_PIN,	'O'},
 {FAULT,     fault,       sizeof(fault),    ovl_fault,		FAULT_PIN,	'F'},
+{HAPPY,     happy,       sizeof(happy),    NULL,		HAPPY_PIN,	'H'},
 // DO NOT REMOVE THIS LAST LINE!
-{0,         NULL,        0,                0,			0}  
+{0,         NULL,        0,                NULL,		0}  
 };
 
 
@@ -297,6 +287,7 @@ void wait(int ms, bool interruptable) {
 					// Flash the status LED, but only if we're not doing a blink
 					if(states[ctr2].id != BLINK && states[ctr2].id != WINK) {
 						ack=ACK_COUNT;
+						gotExpression(&states[ctr2]);
 					}
 					nextstate = states[ctr2].id;
 						if(interruptable) {

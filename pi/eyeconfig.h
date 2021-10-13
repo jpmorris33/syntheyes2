@@ -46,6 +46,7 @@
 	#define BLUSHING_PIN 25 // GPIO26 (pin 37)
 	#define OWO_PIN 0
 	#define FAULT_PIN 28 // GPIO20 (pin 38)
+	#define HAPPY_PIN 26 // GPIO12 (pin 32)
 #endif
 
 #ifdef IMAGES_ARTHI
@@ -55,7 +56,10 @@
 	#define BLUSHING_PIN 25 // GPIO26 (pin 37)
 	#define OWO_PIN 29 // GPIO21 (pin 40)
 	#define FAULT_PIN 28 // GPIO20 (pin 38)
+	#define HAPPY_PIN 26 // GPIO12 (pin 32)
 #endif
+
+#define FAULT_ECHO_PIN 24 // GPIO19 (pin 35)
 
 #define STATUS_PIN 0
 #define VOICE_PIN 0

@@ -175,6 +175,13 @@ bool checkExpression(STATES *state) {
     return !gpio_get(state->pin);
 }
 
+//
+//  Callback for when we have an expression, this can be customised
+//
+
+void gotExpression(STATES *state) {
+}
+
 // Arduino compatibility wrapper
 
 void randomSeed(unsigned int r) {

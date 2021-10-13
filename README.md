@@ -11,9 +11,13 @@ V1.01 - Improved blushing/overlay support, status LED on pins 39 and 40, enable 
 
                 Pin 40 - Startled (Xerian) or OwO (Arthi)
                 Pin 38 - "Fault" - blinking X-eyes (both characters)
-                Pin 37 - Blushing - (both characters)
-                Pin 36 - Annoyed - (both characters)
+                Pin 37 - Blushing (both characters)
+                Pin 36 - Annoyed (both characters)
                 Pin 33 - Eye roll (Xerian only)
+                Pin 32 - Happy (both characters)
+
+                Pin 35 on the Transmitter will also be set low to echo the 'Fault'
+                expression, e.g. to a separate processor for the status lights.
 
                 In addition, an LED can be soldered between pins 39 and 40 of the Receiver, which will flash to
                 indicate to the wearer that an expression change has been selected.

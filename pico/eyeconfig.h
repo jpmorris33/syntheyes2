@@ -44,6 +44,7 @@
 #define FAULT_PIN 0
 #define STATUS_PIN 15
 #define VOICE_PIN 26
+#define HAPPY_PIN 0
 
 #define STATUSPIXELS 6
 

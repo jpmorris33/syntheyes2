@@ -123,10 +123,13 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	// If we're the receiver, set up pin 40 as the ACK LED
+	// If we're the receiver, set up pin 40 as the ACK LED, and pin 39 to echo FAULT to the status light processor
 	if(!transmitter) {
 		LED_PIN = 29; // GPIO21, physical pin 40
 		pinMode(LED_PIN, OUTPUT);
+	} else {
+		pinMode(FAULT_ECHO_PIN, OUTPUT); // physical pin 35
+		digitalWrite(FAULT_ECHO_PIN, 1);
 	}
 
 
@@ -254,6 +257,26 @@ bool checkExpression(STATES *state) {
     }
     return !digitalRead(state->pin);
 }
+
+
+
+//
+//  Callback for when we have an expression, this can be customised
+//
+
+void gotExpression(STATES *state) {
+
+    // echo the fault command to the status light processor
+    if(transmitter && state->id == FAULT) {
+	digitalWrite(FAULT_ECHO_PIN, 0);
+	timing->wait_microseconds(8000);  // Give it 8 milliseconds
+	digitalWrite(FAULT_ECHO_PIN, 1);
+        return;
+    }
+
+}
+
+
 
 // Arduino compatibility wrapper
 
