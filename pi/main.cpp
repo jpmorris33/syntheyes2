@@ -11,6 +11,7 @@
 #include "../inttype.h"
 
 #include "../syntheyes.hpp"
+#include "../config.hpp"
 #include "../NeopixelDriver.hpp"
 #include "Unicorn.hpp"
 #include "../ColourWheel.hpp"
@@ -23,17 +24,17 @@
 // SynthOS 1.01
 PanelBitmap initimg = {
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-    0b11110111, 0b11111101, 0b11110111, 0b11111101, 
+    0b11110101, 0b10111101, 0b11110101, 0b10111101, 
     0b10010101, 0b01010101, 0b10010101, 0b01010101, 
     0b11010101, 0b01010111, 0b11010101, 0b01010111, 
     0b01001001, 0b01010101, 0b01001001, 0b01010101, 
     0b11001001, 0b01010101, 0b11001001, 0b01010101, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-    0b10100100, 0b00100010, 0b10100100, 0b00100010, 
-    0b10101100, 0b01010110, 0b10101100, 0b01010110, 
+    0b10100100, 0b00100110, 0b10100100, 0b00100110, 
+    0b10101100, 0b01010001, 0b10101100, 0b01010001, 
     0b10100100, 0b01010010, 0b10100100, 0b01010010, 
-    0b10100100, 0b01010010, 0b10100100, 0b01010010, 
-    0b01000101, 0b00100010, 0b01000101, 0b00100010, 
+    0b10100100, 0b01010100, 0b10100100, 0b01010100, 
+    0b01000101, 0b00100111, 0b01000101, 0b00100111, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
     0b00001101, 0b10101000, 0b01010111, 0b11010111, 
     0b00001001, 0b00101000, 0b00100101, 0b01010010, 
@@ -49,9 +50,6 @@ extern Timing *timing;
 void initSynthEyes();
 void loopSynthEyes();
 void initPin(int pin);
-void readConfig(FILE *fp);
-void parse(const char *line);
-uint32_t parseColour(const char *hex);
 
 extern PanelBitmap vfb;
 extern PanelBitmap blushfb;
@@ -62,6 +60,7 @@ extern bool updateR;
 extern STATES states[];
 
 static char serialState=0;
+static EXPRESSIONS *forceExpression = NULL;
 
 int LED_PIN = 0;
 int ACK_COUNT = ACK_COUNT_DEFAULT;
@@ -111,6 +110,22 @@ int main(int argc, char *argv[]) {
 		}
 		if(!strcmp(argv[1],"transmitter")) {
 			transmitter=true;
+		}
+		// Switch off the display (for testing)
+		if(!strcmp(argv[1],"off")) {
+			panel->update_nomirror(initimg, 0);
+			timing->wait_microseconds(100000);
+			panel->draw();
+			timing->wait_microseconds(100000);
+			exit(0);
+		}
+		if(!strcmp(argv[1],"eyecolour") && argc > 2) {
+			eyeColour = parseColour(argv[2]);
+
+		}
+		if(!strcmp(argv[1],"test") && argc > 2) {
+			forceExpression = getExpression(argv[2]);
+
 		}
 	}
 
@@ -228,6 +243,10 @@ void transmit(char code) {
 bool checkExpression(STATES *state) {
 	char serialIn=0;
 
+    if(forceExpression && forceExpression->id == state->id) {
+        return true;
+    }
+
     if((!serialState) && (!transmitter) && serialDataAvail(serialfd) > 0) {
 //	printf("reading serial\n");
 	serialIn = serialGetchar(serialfd);
@@ -304,86 +323,37 @@ void setPin(int pin, bool state) {
 }
 
 //
-//  Config reader
+//  Translate physical pins to WiringPi pins
 //
 
-void readConfig(FILE *fp) {
-char buf[1024];
+int mapPin(int pin) {
 
-for(;;) {
-	if(feof(fp)) {
-		return;
-	}
-	buf[0]=0;
-	fgets(buf,1024,fp);
-	parse(buf);
-}
+switch(pin)	{
+	case 40:
+		return 29;
+	//   39 is ground
+	case 38:
+		return 28;
+	case 37:
+		return 25;
+	case 36:
+		return 27;
+// 35 is reserved
+//	case 35:
+//		return 24;
+	//   34 is ground
+	case 33:
+		return 23;
+	case 32:
+		return 26;
+	case 31:
+		return 22;
+	//   30 is ground
+// 29 is reserved too
+//	case 29:
+//		return 21;
+	default:
+		return -1;
+};
 
-}
-
-
-void parse(const char *line) {
-char buf[1024];
-char *cmd;
-char *param;
-int temp;
-
-if(line[0] == '#') {
-	return;
-}
-
-strcpy(buf,line);
-
-cmd=buf;
-param=strchr(buf,' ');
-if(!param) {
-	return;
-	}
-*param++=0;
-while(*param == ' ') param++;
-
-if(!strcasecmp(cmd,"eyecolour:")) {
-	eyeColour = parseColour(param);
-	printf("Set eye colour to 0x%06x\n",eyeColour);
-}
-if(!strcasecmp(cmd,"eyecolor:")) {
-	eyeColour = parseColour(param);
-	printf("Set eye color to 0x%06x\n",eyeColour);
-}
-if(!strcasecmp(cmd,"blushcolour:")) {
-	cheekColour = parseColour(param);
-	printf("Set cheek colour to 0x%06x\n",cheekColour);
-}
-if(!strcasecmp(cmd,"blushcolor:")) {
-	cheekColour = parseColour(param);
-	printf("Set cheek color to 0x%06x\n",cheekColour);
-}
-if(!strcasecmp(cmd,"cheekcolour:")) {
-	cheekColour = parseColour(param);
-	printf("Set cheek colour to 0x%06x\n",cheekColour);
-}
-if(!strcasecmp(cmd,"cheekcolor:")) {
-	cheekColour = parseColour(param);
-	printf("Set cheek color to 0x%06x\n",cheekColour);
-}
-if(!strcasecmp(cmd,"ackCount:")) {
-	temp = atoi(param);
-	if(temp > 0 ) {
-		ACK_COUNT = temp;
-		printf("Set status LED delay to %d ticks\n",ACK_COUNT);
-	}
-}
-
-
-}
-
-
-uint32_t parseColour(const char *hex) {
-uint32_t col = 0;
-
-if(hex[0] == '#') hex++;
-if(hex[0] == '0' && hex[1] == 'x') hex+=2;
-
-sscanf(hex,"%x",&col);
-return col;
 }

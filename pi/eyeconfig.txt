@@ -1,5 +1,22 @@
 # Example config file
 # Copy to the boot partition if you want to change the eye or cheek colour
 
-eyecolour: #002080
+eyecolour: #ff7800
 cheekcolour: #7f0002 
+
+ackcount: 2
+
+# Defaults - note pins 35 & 29 are reserved.  Pin 31 is free and can be used if you like.
+
+#setpin: startled 40	# Xerian
+#setpin: owo      40	# Arthi
+#setpin: eyeroll  33 
+#setpin: fault    38
+#setpin: annoyed  36
+#setpin: happy    32
+#setpin: blushing 37
+
+setpin: eyeroll   33 
+setpin: happy     38
+setpin: fault     36
+setpin: annoyed   32

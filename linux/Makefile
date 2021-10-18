@@ -8,15 +8,15 @@ CFLAGS	= $(DEBUG) -DPLATFORM_LINUX -Wall $(INCLUDE) -Winline -pipe
 LDFLAGS	= -L/usr/local/lib
 LDLIBS    = -lpthread -lm
 
-SRC	= main.cpp Unicorn.cpp ../syntheyes.cpp ../ColourWheel.cpp ../NeopixelDriver.cpp ../PosixTiming.cpp ../MicDriver.cpp ../Timing.cpp ../PanelDriver.cpp
+SRC	= main.cpp Unicorn.cpp ../syntheyes.cpp ../ColourWheel.cpp ../NeopixelDriver.cpp ../PosixTiming.cpp ../MicDriver.cpp ../Timing.cpp ../PanelDriver.cpp ../config.cpp
 
 OBJ	=	$(SRC:.cpp=.o)
 
 BINS	=	$(SRC:.cpp=)
 
-eyes:	main.o Unicorn.o ../syntheyes.o ../ColourWheel.o ../NeopixelDriver.o ../PosixTiming.o ../MicDriver.o ../Timing.o ../PanelDriver.o
+eyes:	main.o Unicorn.o ../syntheyes.o ../ColourWheel.o ../NeopixelDriver.o ../PosixTiming.o ../MicDriver.o ../Timing.o ../PanelDriver.o ../config.o
 	$Q echo [link]
-	$Q $(CC) -o $@ main.o Unicorn.o ../syntheyes.o ../ColourWheel.o ../NeopixelDriver.o ../PosixTiming.o ../MicDriver.o ../Timing.o ../PanelDriver.o $(LDFLAGS) $(LDLIBS)
+	$Q $(CC) -o $@ main.o Unicorn.o ../syntheyes.o ../ColourWheel.o ../NeopixelDriver.o ../PosixTiming.o ../MicDriver.o ../Timing.o ../PanelDriver.o ../config.o $(LDFLAGS) $(LDLIBS)
 
 .cpp.o:
 	$Q echo [CC] $<

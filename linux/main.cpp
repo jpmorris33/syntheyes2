@@ -1,5 +1,5 @@
 //
-//  Raspberry Pi
+//  Linux test harness
 //
 
 #include <stdio.h>
@@ -9,6 +9,7 @@
 #include "../inttype.h"
 
 #include "../syntheyes.hpp"
+#include "../config.hpp"
 #include "../NeopixelDriver.hpp"
 #include "Unicorn.hpp"
 #include "../ColourWheel.hpp"
@@ -26,12 +27,12 @@ PanelBitmap initimg = {
     0b00100100, 0b10101001, 0b00101010, 0b10001000, 
     0b11100100, 0b10111001, 0b00101011, 0b10111000, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-    0b00001000, 0b00000000, 0b00111100, 0b00001000, 
-    0b00011000, 0b00000000, 0b01000010, 0b00011000, 
-    0b00101000, 0b00000000, 0b01000010, 0b00101000, 
-    0b00001000, 0b00000000, 0b01000010, 0b00001000, 
-    0b00001000, 0b00000000, 0b01000010, 0b00001000, 
-    0b00001000, 0b00110000, 0b01000010, 0b00001000, 
+    0b00001000, 0b00000000, 0b00111100, 0b00011000, 
+    0b00011000, 0b00000000, 0b01000010, 0b00100100, 
+    0b00101000, 0b00000000, 0b01000010, 0b00000100, 
+    0b00001000, 0b00000000, 0b01000010, 0b00011000, 
+    0b00001000, 0b00000000, 0b01000010, 0b00100000, 
+    0b00001000, 0b00110000, 0b01000010, 0b00100000, 
     0b00111100, 0b00110000, 0b00111100, 0b00111100, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
@@ -62,7 +63,7 @@ uint32_t eyeColour = (EYECOLOUR_BLUE<<16)|(EYECOLOUR_GREEN<<8)|EYECOLOUR_RED;
 uint32_t cheekColour = (BLUSHCOLOUR_BLUE<<16)|(BLUSHCOLOUR_GREEN<<8)|BLUSHCOLOUR_RED;
 
 
-int main() {
+int main(int argc, char *argv[]) {
 	panel = new Unicorn();
 	panel->init();
 
@@ -76,6 +77,16 @@ int main() {
 	adc = new MicDriver();
 	adc->init(VOICE_PIN);
 #endif
+
+	if(argc > 1) {
+		FILE *fp = fopen(argv[1],"r");
+		if(!fp) {
+			printf("Could not open config file '%s'\n",argv[1]);
+			exit(1);
+		}
+		readConfig(fp);
+		fclose(fp);
+	}
 
 	initSynthEyes();
 
@@ -202,4 +213,8 @@ void setPin(int pin, bool state) {
 //	if(pin >= 0) {
 //		digitalWrite(pin,state);
 //	}
+}
+
+int mapPin(int pin) {
+return pin;
 }

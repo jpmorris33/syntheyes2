@@ -103,7 +103,21 @@ struct STATES states[] = {
 {FAULT,     fault,       sizeof(fault),    ovl_fault,		FAULT_PIN,	'F'},
 {HAPPY,     happy,       sizeof(happy),    NULL,		HAPPY_PIN,	'H'},
 // DO NOT REMOVE THIS LAST LINE!
-{0,         NULL,        0,                NULL,		0}  
+{0,         NULL,        0,                NULL,		0,		0}  
+};
+
+// Name lookup for the config parser
+struct EXPRESSIONS expressionnames[] = {
+	{ "rolleye",	ROLLEYE },
+	{ "eyeroll",	ROLLEYE },
+	{ "startled",	STARTLED },
+	{ "annoyed",	ANNOYED },
+	{ "blushing",	BLUSHING },
+	{ "blush",	BLUSHING },
+	{ "owo",	OWO },
+	{ "fault",	FAULT },
+	{ "happy",	HAPPY },
+	{ NULL,		0 }
 };
 
 

@@ -11,6 +11,11 @@ struct STATES {
   char code;
 };
 
+struct EXPRESSIONS {
+  const char *name;
+  int id;
+};
+
 // System state variables
 
 #define WAITING -1
