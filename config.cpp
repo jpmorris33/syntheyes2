@@ -28,6 +28,7 @@ extern struct STATES states[];
 
 extern int LED_PIN;
 extern int ACK_COUNT;
+extern int COOLOFF_COUNT;
 extern uint32_t eyeColour;
 extern uint32_t cheekColour;
 
@@ -105,6 +106,13 @@ if(!strcasecmp(cmd,"ackcount:")) {
 	if(temp > 0 ) {
 		ACK_COUNT = temp;
 		printf("Set status LED delay to %d ticks\n",ACK_COUNT);
+	}
+}
+if(!strcasecmp(cmd,"cooloff:")) {
+	temp = atoi(param);
+	if(temp > 0 ) {
+		COOLOFF_COUNT = temp;
+		printf("Set cooloff between same expression to %d ticks\n",COOLOFF_COUNT);
 	}
 }
 if(!strcasecmp(cmd,"setpin:")) {

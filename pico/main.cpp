@@ -35,6 +35,7 @@ PanelBitmap initimg = {
 
 int LED_PIN = PICO_DEFAULT_LED_PIN;
 int ACK_COUNT = ACK_COUNT_DEFAULT;
+int COOLOFF_COUNT = COOLOFF_DEFAULT;
 
 extern PanelDriver *panel;
 extern NeopixelDriver *statuslights;

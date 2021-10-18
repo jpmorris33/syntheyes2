@@ -16,6 +16,7 @@
 extern PanelBitmap initimg;
 extern int LED_PIN;
 extern int ACK_COUNT;
+extern int COOLOFF_COUNT;
 PanelDriver *panel;
 NeopixelDriver *statuslights;
 MicDriver *adc;
@@ -66,6 +67,8 @@ int state=0;
 int blinkidx=0;
 int blinkdir=0;
 int nextstate=0;  // For queueing user-triggered states
+int laststate=-1;
+int cooloff = 0;
 int ack=0;
 bool updateL=true;
 bool updateR=true;
@@ -162,6 +165,7 @@ void loopSynthEyes() {
     drawEyeL();
     setPin(LED_PIN, ack > 0);
     if(ack > 0) ack--;
+    if(cooloff > 0) cooloff--;
 
   // If we're idling, count down
   if(waittick > 0) {
@@ -191,6 +195,8 @@ void loopSynthEyes() {
       eyeptr=0;
       // Wait between 5-250 cycles before blinking again
       waittick = random(MIN_DELAY,MAX_DELAY);
+      laststate = state;
+      cooloff = COOLOFF_COUNT;
       state = WAITING;
     }
 
@@ -298,6 +304,10 @@ void wait(int ms, bool interruptable) {
 		if(state == WAITING) {
 			for(int ctr2=0;states[ctr2].anim;ctr2++) {
 				if(checkExpression(&states[ctr2])) {
+					// Did we just do it?
+					if(states[ctr2].id == laststate && cooloff > 0) {
+						continue;
+					}
 					// Flash the status LED, but only if we're not doing a blink
 					if(states[ctr2].id != BLINK && states[ctr2].id != WINK) {
 						ack=ACK_COUNT;
