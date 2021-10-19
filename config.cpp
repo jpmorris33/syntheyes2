@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "inttype.h"
 
 #include "syntheyes.hpp"
@@ -33,6 +34,7 @@ extern uint32_t eyeColour;
 extern uint32_t cheekColour;
 
 extern int mapPin(int pin);
+extern bool patch_arthi();
 
 
 //
@@ -144,6 +146,17 @@ if(!strcasecmp(cmd,"setpin:")) {
 		}
 	}
 }
+if(!strcasecmp(cmd,"sprites:")) {
+	strcpy(buf2,param);
+	nextWord(buf2);
+
+	if(!strcasecmp(buf2,"arthi")) {
+		printf("Switching to the Raptor's Den sprite set\n");
+		if(!patch_arthi()) {
+			printf("Error patching sprites\n");
+		}
+	}
+}
 
 
 }
@@ -192,7 +205,7 @@ return NULL;
 
 char *nextWord(char *input) {
 char *start=input,*end=NULL;
-while(*start == ' ') start++;
+while(isspace(*start)) start++;
 end=nextWordEnd(start);
 *end=0;
 
@@ -201,8 +214,8 @@ return start;
 
 char *nextWordEnd(char *input) {
 char *start=input,*end=NULL;
-while(*start == ' ') start++;
+while(isspace(*start)) start++;
 end=start;
-while(*end != ' ' && *end) end++;
+while(*end && !isspace(*end)) end++;
 return end;
 }

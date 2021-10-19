@@ -4,9 +4,8 @@
 
 #ifndef EYE_CONFIG
 
-// Pick one
+// Pi version can repatch the sprites on-the-fly
 #define IMAGES_XERIAN
-//#define IMAGES_ARTHI
 
 // Duration of acknowledgement LED
 #define ACK_COUNT_DEFAULT 4

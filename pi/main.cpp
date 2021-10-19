@@ -21,7 +21,7 @@
 #include "eyeconfig.h"
 
 
-// SynthOS 1.01
+// SynthOS 1.03
 PanelBitmap initimg = {
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
     0b11110101, 0b10111101, 0b11110101, 0b10111101, 
@@ -32,9 +32,9 @@ PanelBitmap initimg = {
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
     0b10100100, 0b00100110, 0b10100100, 0b00100110, 
     0b10101100, 0b01010001, 0b10101100, 0b01010001, 
-    0b10100100, 0b01010010, 0b10100100, 0b01010010, 
-    0b10100100, 0b01010100, 0b10100100, 0b01010100, 
-    0b01000101, 0b00100111, 0b01000101, 0b00100111, 
+    0b10100100, 0b01010110, 0b10100100, 0b01010110, 
+    0b10100100, 0b01010001, 0b10100100, 0b01010001, 
+    0b01000101, 0b00100110, 0b01000101, 0b00100110, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
     0b00001101, 0b10101000, 0b01010111, 0b11010111, 
     0b00001001, 0b00101000, 0b00100101, 0b01010010, 
@@ -50,6 +50,7 @@ extern Timing *timing;
 void initSynthEyes();
 void loopSynthEyes();
 void initPin(int pin);
+extern bool patch_arthi();
 
 extern PanelBitmap vfb;
 extern PanelBitmap blushfb;
@@ -154,6 +155,10 @@ int main(int argc, char *argv[]) {
 		panel->draw();
 		timing->wait_microseconds(1000);
 	}
+
+	#ifdef IMAGES_ARTHI
+		patch_arthi();
+	#endif
 
 	while(1) {
 		loopSynthEyes();

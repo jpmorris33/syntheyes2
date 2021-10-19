@@ -14,27 +14,27 @@
 
 // NOTE: Animations should always start with the default expression (e.g. 0) as they go back to the first frame in the list when the sequence finishes!
 
-signed char closeeye[] = {0,-50,0}; // Blink is now done procedurally instead of using a complex animation, so just display one frame and wait
+signed char arthi_closeeye[] = {0,-50,0}; // Blink is now done procedurally instead of using a complex animation, so just display one frame and wait
 
-signed char rolleye[] = {0, 0}; // Arthi doesn't do this yet
+signed char arthi_rolleye[] = {0, 0}; // Arthi doesn't do this yet
 
-signed char startled[] = {0, 0}; // Arthi doesn't do this yet
+signed char arthi_startled[] = {0, 0}; // Arthi doesn't do this yet
 
-signed char annoyed[] = {0, 5, 6, -30, 6, 5, 0, -10};
+signed char arthi_annoyed[] = {0, 5, 6, -30, 6, 5, 0, -10};
 
-signed char blushing[] = {0,-30,0}; // Arthi doesn't quite do this yet
+signed char arthi_blushing[] = {0,0,-30,0}; // Arthi doesn't quite do this yet
 
-signed char fault[] = {0,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4};
+signed char arthi_fault[] = {0,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4,7,-4,1,-4};
 
-signed char owo[] = {0, 2, 3, 4, -30, 4, 3, 2, 0, -10};
+signed char arthi_owo[] = {0, 2, 3, 4, -30, 4, 3, 2, 0, -10};
 
-signed char happy[] = {0,8,-30,0};
+signed char arthi_happy[] = {0,8,-30,0};
 
 // Overlay animation sequence - must have the same number of steps as the eye animation
 
-signed char ovl_blushing[] = {0, 1, -30, 0};
+signed char arthi_ovl_blushing[] = {0, 1, -30, 0};
 
-signed char ovl_fault[] = {0,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4};
+signed char arthi_ovl_fault[] = {0,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4};
 
 
 
@@ -58,7 +58,7 @@ signed char ovl_fault[] = {0,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2,-4,0,-4,2
 //
 
 // Right eye (facing left)
-unsigned char eye[][32] = {
+unsigned char arthi_eye[][32] = {
     // Basic open eye (0)
     {
       0b00000000, 0b00000000,
@@ -235,7 +235,7 @@ unsigned char eye[][32] = {
 
   };
 
-unsigned char overlay[][32] = {
+unsigned char arthi_overlay[][32] = {
     // Nothing (0)
     {
       0b00000000,0b00000000,

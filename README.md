@@ -26,6 +26,10 @@ V1.01 - Improved blushing/overlay support, status LED on pins 39 and 40, enable 
                 The status LED duration can be overridden in eyeconfig.txt,
                 e.g. "ackcount: 2"  ...the default value is 4.
 
+V1.02 - Dynamic pin assignment via eyeconfig.txt on Pi, cooldown timer, eye off mode for testing
+
+V1.03 - Pi version can now switch to Raptor's Den sprites via eyeconfig.txt
+
 
 The Pico drivers use some code from the Pico examples, which are 3-clause BSD licensed.
 

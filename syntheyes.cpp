@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "syntheyes.hpp"
+#include "config.hpp"
 #include "PanelDriver.hpp"
 #include "NeopixelDriver.hpp"
 #include "ColourWheel.hpp"
@@ -85,12 +86,8 @@ EyeBitmap blushbuffer;
 //  Animation data
 //
 
-#ifdef IMAGES_XERIAN
-	#include "images-xerian.h"
-#endif
-#ifdef IMAGES_ARTHI
-	#include "images-arthi.h"
-#endif
+#include "images-xerian.h"
+#include "images-arthi.h"
 
 
 // Add any new animation triggers here
@@ -362,3 +359,43 @@ void statusCycle(unsigned char r, unsigned char g, unsigned char b) {
 #endif
 
 }
+
+
+void patch_state(int id, signed char *anim, int len, signed char *ovl) {
+	STATES *s=getState(id);
+	if(!s) {
+		return;
+	}
+	s->anim = anim;
+	s->animlen = len;
+	s->overlay = ovl;
+}
+
+#define PATCH_ARTHI(a,b,c) patch_state(a,arthi_##b,sizeof(arthi_##b),c);
+
+bool patch_arthi() {
+
+	if(sizeof(arthi_eye) > sizeof(eye)) {
+		return false;
+	}
+	if(sizeof(arthi_overlay) > sizeof(overlay)) {
+		return false;
+	}
+
+	PATCH_ARTHI(BLINK,closeeye,NULL);
+	PATCH_ARTHI(WINK,closeeye,NULL);
+	PATCH_ARTHI(ROLLEYE,rolleye,NULL);
+	PATCH_ARTHI(STARTLED,startled,NULL);
+	PATCH_ARTHI(ANNOYED,annoyed,NULL);
+	PATCH_ARTHI(BLUSHING,blushing,arthi_ovl_blushing);
+	PATCH_ARTHI(OWO,owo,NULL);
+	PATCH_ARTHI(FAULT,fault,arthi_ovl_fault);
+	PATCH_ARTHI(HAPPY,happy,NULL);
+
+	// Assume Arthi is smaller than Xerian
+	memcpy(eye,arthi_eye,sizeof(arthi_eye));
+	memcpy(overlay,arthi_overlay,sizeof(arthi_overlay));
+
+	return true;
+}
+
