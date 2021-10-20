@@ -28,8 +28,9 @@ V1.01 - Improved blushing/overlay support, status LED on pins 39 and 40, enable 
 
 V1.02 - Dynamic pin assignment via eyeconfig.txt on Pi, cooldown timer, eye off mode for testing
 
-V1.03 - Pi version can now switch to Raptor's Den sprites via eyeconfig.txt
-
+V1.03 - Pi version can now switch to Raptor's Den sprites via eyeconfig.txt, e.g. "sprites: raptor"
+        Added extra animations so Xerian supports OwO and Raptor supports startled and happy.
+        Raptor doesn't yet have a roll-eye animation, and will run the annoyed face instead
 
 The Pico drivers use some code from the Pico examples, which are 3-clause BSD licensed.
 

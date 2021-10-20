@@ -22,4 +22,4 @@ setpin: fault     36
 setpin: annoyed   32
 
 # To enable the Raptor's Den sprites
-#sprites: arthi
+#sprites: raptor

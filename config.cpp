@@ -34,7 +34,7 @@ extern uint32_t eyeColour;
 extern uint32_t cheekColour;
 
 extern int mapPin(int pin);
-extern bool patch_arthi();
+extern bool patch_raptorsden();
 
 
 //
@@ -150,9 +150,9 @@ if(!strcasecmp(cmd,"sprites:")) {
 	strcpy(buf2,param);
 	nextWord(buf2);
 
-	if(!strcasecmp(buf2,"arthi")) {
+	if(!strcasecmp(buf2,"raptor")) {
 		printf("Switching to the Raptor's Den sprite set\n");
-		if(!patch_arthi()) {
+		if(!patch_raptorsden()) {
 			printf("Error patching sprites\n");
 		}
 	}

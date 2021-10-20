@@ -149,16 +149,15 @@ int main(int argc, char *argv[]) {
 		digitalWrite(FAULT_ECHO_PIN, 1);
 	}
 
+	#ifdef IMAGES_ARTHI
+		patch_raptorsden();
+	#endif
 
 	panel->update_nomirror(initimg, colour);
 	for(int ctr=0;ctr<2000;ctr++) {
 		panel->draw();
 		timing->wait_microseconds(1000);
 	}
-
-	#ifdef IMAGES_ARTHI
-		patch_arthi();
-	#endif
 
 	while(1) {
 		loopSynthEyes();

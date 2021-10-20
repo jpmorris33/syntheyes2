@@ -360,6 +360,10 @@ void statusCycle(unsigned char r, unsigned char g, unsigned char b) {
 
 }
 
+//
+//	Patch the sprite set at runtime.
+//	This is a bit hacky, but quicker and easier than redesigning everything.
+//
 
 void patch_state(int id, signed char *anim, int len, signed char *ovl) {
 	STATES *s=getState(id);
@@ -371,30 +375,30 @@ void patch_state(int id, signed char *anim, int len, signed char *ovl) {
 	s->overlay = ovl;
 }
 
-#define PATCH_ARTHI(a,b,c) patch_state(a,arthi_##b,sizeof(arthi_##b),c);
+#define PATCH_RAPTORSDEN(a,b,c) patch_state(a,rd_##b,sizeof(rd_##b),c);
 
-bool patch_arthi() {
+bool patch_raptorsden() {
 
-	if(sizeof(arthi_eye) > sizeof(eye)) {
+	if(sizeof(rd_eye) > sizeof(eye)) {
 		return false;
 	}
-	if(sizeof(arthi_overlay) > sizeof(overlay)) {
+	if(sizeof(rd_overlay) > sizeof(overlay)) {
 		return false;
 	}
 
-	PATCH_ARTHI(BLINK,closeeye,NULL);
-	PATCH_ARTHI(WINK,closeeye,NULL);
-	PATCH_ARTHI(ROLLEYE,rolleye,NULL);
-	PATCH_ARTHI(STARTLED,startled,NULL);
-	PATCH_ARTHI(ANNOYED,annoyed,NULL);
-	PATCH_ARTHI(BLUSHING,blushing,arthi_ovl_blushing);
-	PATCH_ARTHI(OWO,owo,NULL);
-	PATCH_ARTHI(FAULT,fault,arthi_ovl_fault);
-	PATCH_ARTHI(HAPPY,happy,NULL);
+	PATCH_RAPTORSDEN(BLINK,closeeye,NULL);
+	PATCH_RAPTORSDEN(WINK,closeeye,NULL);
+	PATCH_RAPTORSDEN(ROLLEYE,rolleye,NULL);
+	PATCH_RAPTORSDEN(STARTLED,startled,NULL);
+	PATCH_RAPTORSDEN(ANNOYED,annoyed,NULL);
+	PATCH_RAPTORSDEN(BLUSHING,blushing,rd_ovl_blushing);
+	PATCH_RAPTORSDEN(OWO,owo,NULL);
+	PATCH_RAPTORSDEN(FAULT,fault,rd_ovl_fault);
+	PATCH_RAPTORSDEN(HAPPY,happy,NULL);
 
-	// Assume Arthi is smaller than Xerian
-	memcpy(eye,arthi_eye,sizeof(arthi_eye));
-	memcpy(overlay,arthi_overlay,sizeof(arthi_overlay));
+	// Assume Arthi's sprite data is smaller than Xerian's
+	memcpy(eye,rd_eye,sizeof(rd_eye));
+	memcpy(overlay,rd_overlay,sizeof(rd_overlay));
 
 	return true;
 }

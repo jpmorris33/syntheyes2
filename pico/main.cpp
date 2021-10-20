@@ -46,6 +46,7 @@ extern Timing *timing;
 void initSynthEyes();
 void loopSynthEyes();
 void initPin(int pin);
+extern bool patch_raptorsden();
 
 extern PanelBitmap vfb;
 extern PanelBitmap blushfb;
@@ -77,6 +78,10 @@ int main() {
 	adc = new PicoMic();
 	adc->init(VOICE_PIN);
 #endif
+
+	#ifdef IMAGES_ARTHI
+		patch_raptorsden();
+	#endif
 
 	initSynthEyes();
 
