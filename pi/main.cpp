@@ -21,7 +21,7 @@
 #include "eyeconfig.h"
 
 
-// SynthOS 1.03
+// SynthOS 1.04
 PanelBitmap initimg = {
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
     0b11110101, 0b10111101, 0b11110101, 0b10111101, 
@@ -30,15 +30,35 @@ PanelBitmap initimg = {
     0b01001001, 0b01010101, 0b01001001, 0b01010101, 
     0b11001001, 0b01010101, 0b11001001, 0b01010101, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-    0b10100100, 0b00100110, 0b10100100, 0b00100110, 
-    0b10101100, 0b01010001, 0b10101100, 0b01010001, 
-    0b10100100, 0b01010110, 0b10100100, 0b01010110, 
+    0b10100100, 0b00100101, 0b10100100, 0b00100101, 
+    0b10101100, 0b01010101, 0b10101100, 0b01010101, 
+    0b10100100, 0b01010111, 0b10100100, 0b01010111, 
     0b10100100, 0b01010001, 0b10100100, 0b01010001, 
-    0b01000101, 0b00100110, 0b01000101, 0b00100110, 
+    0b01000101, 0b00100001, 0b01000101, 0b00100001, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
     0b00001101, 0b10101000, 0b01010111, 0b11010111, 
     0b00001001, 0b00101000, 0b00100101, 0b01010010, 
     0b00001001, 0b10010000, 0b01010100, 0b01010010, 
+};
+
+// Comms error
+PanelBitmap serialerr = {
+    0b00000000, 0b00000000, 0b00000000, 0b00000000, 
+    0b11101110, 0b11111000, 0b11101110, 0b11111000,
+    0b10001010, 0b10101000, 0b10001010, 0b10101000, 
+    0b10001010, 0b10101000, 0b10001010, 0b10101000, 
+    0b10001010, 0b10101000, 0b10001010, 0b10101000, 
+    0b11101110, 0b10101000, 0b11101110, 0b10101000, 
+    0b00000000, 0b00000000, 0b00000000, 0b00000000, 
+    0b11101110, 0b11100110, 0b11101110, 0b11100110, 
+    0b10001010, 0b10100110, 0b10001010, 0b10100110, 
+    0b11101100, 0b11000110, 0b11101100, 0b11000110, 
+    0b10001010, 0b10100000, 0b10001010, 0b10100000, 
+    0b11101010, 0b10100110, 0b11101010, 0b10100110, 
+    0b00000000, 0b00000000, 0b00000000, 0b00000000, 
+    0b00000000, 0b00000000, 0b00000000, 0b00000000, 
+    0b00000000, 0b00000000, 0b00000000, 0b00000000, 
+    0b00000000, 0b00000000, 0b00000000, 0b00000000, 
 };
 
 extern PanelDriver *panel;
@@ -59,6 +79,7 @@ extern EyeBitmap blushbuffer;
 extern bool updateL;
 extern bool updateR;
 extern STATES states[];
+extern char serialPort[128];
 
 static char serialState=0;
 static EXPRESSIONS *forceExpression = NULL;
@@ -75,6 +96,8 @@ bool transmitter = true;
 
 int main(int argc, char *argv[]) {
 	FILE *fp;
+
+	strcpy(serialPort,"/dev/ttyAMA0");
 
 	unsigned long colour=0x404040;
 	panel = new Unicorn();
@@ -131,12 +154,20 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	serialfd=serialOpen("/dev/ttyAMA0", 19200);
+	printf("Opening serial port '%s'\n", serialPort);
+	serialfd=serialOpen(serialPort, 19200);
 	if(serialfd != -1) {
 		if(transmitter) {
 			printf("Opened serial for transmission\n");
 		} else {
 			printf("Opened serial for reception\n");
+		}
+	} else {
+		printf("Error opening serial port '%s'\n", serialPort);
+		panel->update_nomirror(serialerr, 0x00ff0000);
+		while(1) {
+			panel->draw();
+			timing->wait_microseconds(1000);
 		}
 	}
 

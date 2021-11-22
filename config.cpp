@@ -23,6 +23,7 @@ static char *nextWordEnd(char *input);
 
 STATES *getState(int id);
 EXPRESSIONS *getExpression(const char *expression);
+char serialPort[128];
 
 extern struct EXPRESSIONS expressionnames[];
 extern struct STATES states[];
@@ -156,6 +157,13 @@ if(!strcasecmp(cmd,"sprites:")) {
 			printf("Error patching sprites\n");
 		}
 	}
+}
+
+if(!strcasecmp(cmd,"serial:")) {
+	strcpy(buf2,param);
+	nextWord(buf2);
+	strncpy(serialPort,buf2,128);
+	serialPort[127]=0;
 }
 
 
