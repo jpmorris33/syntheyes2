@@ -23,3 +23,11 @@ setpin: annoyed   32
 
 # To enable the Raptor's Den sprites
 #sprites: raptor
+
+# Special effects (experimental) - pick one of these
+#effect: cycle
+#effect: rainbow_h
+#effect: rainbow_v
+
+# Set speed of the rainbow effects - bigger is slower
+#rainbowspeed: 10

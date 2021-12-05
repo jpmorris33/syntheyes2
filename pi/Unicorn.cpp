@@ -12,6 +12,7 @@
 unsigned char spioutputbuf[769];
 unsigned char lastbuf[769];
 extern bool transmitter;
+extern uint32_t rainbow[16]; // Colour table
 
 //
 //	Init the Unicorn HD driver
@@ -91,6 +92,7 @@ void Unicorn::draw() {
 	wiringPiSPIDataRW(0,spioutputbuf,769);
 }
 #endif
+
 //
 //	Convert a 32x16 monochrome bitmap into a format the panel understands.  This image is mirrored on panel 2.
 //
@@ -129,6 +131,107 @@ void Unicorn::update(PanelBitmap imgbitmap, uint32_t colour) {
 		}
 	}
 }
+
+//
+//	Convert a 32x16 monochrome bitmap into a format the panel understands with rainbow effect.  This image is mirrored on panel 2.
+//
+void Unicorn::update_rainbowH(PanelBitmap imgbitmap, int offset) {
+	unsigned char *buffer = &framebuffer[0];
+	unsigned char *ptr, pixels;
+	unsigned char r,g,b;
+	int index=0,xpos=0;
+	int ctr,ctr2,wd8=BITMAP_WIDTH/16; // width divided by 8, but divided by 2 for 2 panels (e.g. divided by 16)
+
+
+	for(int h=0;h<BITMAP_HEIGHT;h++)	{
+		ptr = imgbitmap[h];
+
+		// First panel
+		xpos=0;
+		for(ctr=0;ctr<wd8;ctr++) {
+			pixels = *ptr++;
+			for(ctr2=0;ctr2<8;ctr2++) {
+
+				index = (offset + xpos++)&0x0f;
+				r=rainbow[index]&0xff;
+				g=(rainbow[index]>>8)&0xff;
+				b=(rainbow[index]>>16)&0xff;
+
+				*buffer++ = (pixels & 128) ? b : 0;
+				*buffer++ = (pixels & 128) ? g : 0;
+				*buffer++ = (pixels & 128) ? r : 0;
+				pixels <<= 1;
+			}
+		}
+
+		// Second panel (mirrored)
+		xpos=0;
+		for(ctr=0;ctr<wd8;ctr++) {
+			index = (offset + h)&0x0f;
+			r=rainbow[index]&0xff;
+			g=(rainbow[index]>>8)&0xff;
+			b=(rainbow[index]>>16)&0xff;
+
+			pixels = *(--ptr);
+			for(ctr2=0;ctr2<8;ctr2++) {
+				index = (offset + xpos++)&0x0f;
+				r=rainbow[index]&0xff;
+				g=(rainbow[index]>>8)&0xff;
+				b=(rainbow[index]>>16)&0xff;
+
+				*buffer++ = (pixels & 1) ? b : 0;
+				*buffer++ = (pixels & 1) ? g : 0;
+				*buffer++ = (pixels & 1) ? r : 0;
+				pixels >>= 1;
+			}
+		}
+	}
+}
+
+//
+//	Convert a 32x16 monochrome bitmap into a format the panel understands with rainbow effect.  This image is mirrored on panel 2.
+//
+
+void Unicorn::update_rainbowV(PanelBitmap imgbitmap, int offset) {
+	unsigned char *buffer = &framebuffer[0];
+	unsigned char *ptr, pixels;
+	unsigned char r,g,b;
+	int index=0;
+	int ctr,ctr2,wd8=BITMAP_WIDTH/16; // width divided by 8, but divided by 2 for 2 panels (e.g. divided by 16)
+
+
+	for(int h=0;h<BITMAP_HEIGHT;h++)	{
+		ptr = imgbitmap[h];
+
+		index = (offset + h)&0x0f;
+		r=rainbow[index]&0xff;
+		g=(rainbow[index]>>8)&0xff;
+		b=(rainbow[index]>>16)&0xff;
+
+		// First panel
+		for(ctr=0;ctr<wd8;ctr++) {
+			pixels = *ptr++;
+			for(ctr2=0;ctr2<8;ctr2++) {
+				*buffer++ = (pixels & 128) ? b : 0;
+				*buffer++ = (pixels & 128) ? g : 0;
+				*buffer++ = (pixels & 128) ? r : 0;
+				pixels <<= 1;
+			}
+		}
+
+		// Second panel (mirrored)
+		for(ctr=0;ctr<wd8;ctr++) {
+			pixels = *(--ptr);
+			for(ctr2=0;ctr2<8;ctr2++) {
+				*buffer++ = (pixels & 1) ? b : 0;
+				*buffer++ = (pixels & 1) ? g : 0;
+				*buffer++ = (pixels & 1) ? r : 0;
+				pixels >>= 1;
+			}
+		}
+	}
+}
+
 
 //
 //	Convert a 32x16 monochrome bitmap into a format the panel understands.  This image is sent unaltered to both panels.

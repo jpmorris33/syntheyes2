@@ -33,6 +33,9 @@ extern int ACK_COUNT;
 extern int COOLOFF_COUNT;
 extern uint32_t eyeColour;
 extern uint32_t cheekColour;
+extern int drawmode;
+extern bool cycle;
+extern int rainbowspeed;
 
 extern int mapPin(int pin);
 extern bool patch_raptorsden();
@@ -158,12 +161,37 @@ if(!strcasecmp(cmd,"sprites:")) {
 		}
 	}
 }
-
 if(!strcasecmp(cmd,"serial:")) {
 	strcpy(buf2,param);
 	nextWord(buf2);
 	strncpy(serialPort,buf2,128);
 	serialPort[127]=0;
+}
+if(!strcasecmp(cmd,"effect:")) {
+	strcpy(buf2,param);
+	nextWord(buf2);
+
+	if(!strcasecmp(buf2,"cycle")) {
+		printf("Eye will colour cycle\n");
+		cycle=true;
+	}
+
+	if(!strcasecmp(buf2,"rainbow_v")) {
+		printf("Eye will have a vertical rainbow effect\n");
+		drawmode = DRAWMODE_RAINBOW_V;
+	}
+
+	if(!strcasecmp(buf2,"rainbow_h")) {
+		printf("Eye will have a horizontal rainbow effect\n");
+		drawmode = DRAWMODE_RAINBOW_H;
+	}
+}
+if(!strcasecmp(cmd,"rainbowspeed:")) {
+	temp = atoi(param);
+	if(temp > 0 ) {
+		rainbowspeed = temp;
+		printf("Set rainbow delay to %d ticks\n",rainbowspeed);
+	}
 }
 
 

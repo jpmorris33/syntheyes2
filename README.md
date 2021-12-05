@@ -69,3 +69,16 @@ copied to the /boot partition, and therefore the binary and config can be update
 I would strongly recommend editing /ets/fstab so that the root partition is mounted read-only - this will preserve the life of the SD card
 and also helps protect the OS from filesystem corruption when the power is cut to the eye module.
 
+V1.04 - Add error message if the comms port cannot be opened
+        Override serial port via config with e.g. serial: /dev/tty1234
+
+V1.05 - Add new rainbow and colour cycle effects (experimental, not tested on Pico yet!)
+        To enable this, add one of the following lines to the config file:
+                effect: rainbow_h
+                effect: rainbow_v
+                effect: cycle
+        Speed can be set with
+                rainbowspeed: 10
+        ...10 is the default.  Larger numbers will slow it down, smaller numbers will speed it up but increase the risk of glitching
+
+		

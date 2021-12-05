@@ -13,7 +13,10 @@
 
 #include "eyeconfig.h"
 
-// SynthOS 1.00
+#define CYCLE_EYES
+
+
+// SynthOS 1.05
 extern PanelBitmap initimg;
 extern int LED_PIN;
 extern int ACK_COUNT;
@@ -40,6 +43,7 @@ extern bool transmitter;
 #define MIN_DELAY    5   // Minimum delay between blinks
 #define MAX_DELAY    250 // Maximum delay between blinks
 #define STATUS_DIVIDER 16  // This controls the speed of the status light chaser, bigger is slower
+#define CYCLE_DIVIDER 32  // This controls the speed of the eye colour shift, bigger is slower.  16 or less will glitch the display
 
 #define STEPS (STATUSPIXELS*2)
 
@@ -53,6 +57,10 @@ void getNextAnim();
 extern bool checkExpression(STATES *state);
 extern void gotExpression(STATES *state);
 void statusCycle(unsigned char r, unsigned char g, unsigned char b);
+void eyeCycle();
+void cycle_null();
+void cycle_colour();
+void cycle_rainbow();
 
 void randomSeed(unsigned int r);
 int random(int lowest, int highest);
@@ -71,9 +79,13 @@ int nextstate=0;  // For queueing user-triggered states
 int laststate=-1;
 int cooloff = 0;
 int ack=0;
+int drawmode=DRAWMODE_NORMAL;
+bool cycle = false;
+int rainbow_offset=0;
 bool updateL=true;
 bool updateR=true;
 unsigned char ramp[STEPS];
+void (*update_cycle)(void) = cycle_null;
 
 PanelBitmap vfb;
 PanelBitmap blushfb;
@@ -81,6 +93,10 @@ PanelBitmap blushfb;
 // Frame buffer for procedural blink
 EyeBitmap framebuffer;
 EyeBitmap blushbuffer;
+
+// Rainbow effect
+uint32_t rainbow[16] = {0xff1700,0xff7200,0xffce00,0xe8ff00,0x79ff00,0x1fff00,0x00ff3d,0x00ff98,0x00fff4,0x00afff,0x0054ff,0x0800ff,0x6300ff,0xbe00ff,0xff00e4,0xff0089};
+int rainbowspeed = 10;
 
 //
 //  Animation data
@@ -117,6 +133,7 @@ struct EXPRESSIONS expressionnames[] = {
 	{ "owo",	OWO },
 	{ "fault",	FAULT },
 	{ "happy",	HAPPY },
+	{ "blink",	BLINK },
 	{ NULL,		0 }
 };
 
@@ -146,12 +163,21 @@ void initSynthEyes() {
 		}
 	}
 
+  if(cycle) {
+     update_cycle = cycle_colour;
+  }
+  if(drawmode == DRAWMODE_RAINBOW_H || drawmode == DRAWMODE_RAINBOW_V) {
+     update_cycle = cycle_rainbow;
+  }
+
 
   // Initial draw
   getSprite(&eye[frameidx][0], 0);
   drawEyeR();
   drawEyeL();
+
   statusCycle(STATUSCOLOUR_RED,STATUSCOLOUR_GREEN,STATUSCOLOUR_BLUE);
+
 }
 
 void loopSynthEyes() {
@@ -322,16 +348,17 @@ void wait(int ms, bool interruptable) {
 }
 
 void statusCycle(unsigned char r, unsigned char g, unsigned char b) {
-#ifdef STATUS_LIGHTS
-  uint16_t ctr;
   static uint16_t pos=0;
   static int divider=0;
   int maxdiv=STATUS_DIVIDER;
+
+#ifdef STATUS_LIGHTS
   bool bright = false;
 
   if(adc) {
     bright = !(adc->read() > ADC_THRESHOLD);
   }
+#endif
 
   divider++;
   if(divider > maxdiv) {
@@ -342,7 +369,8 @@ void statusCycle(unsigned char r, unsigned char g, unsigned char b) {
     pos=0;
   }
 
-  for(ctr=0; ctr< STATUSPIXELS; ctr++) {
+#ifdef STATUS_LIGHTS
+  for(int ctr=0; ctr< STATUSPIXELS; ctr++) {
     if(bright) {
       statuslights->setpixel(ctr, STATUSFLASH_RED, STATUSFLASH_GREEN, STATUSFLASH_BLUE, 255); // Flash at full brightness
     } else {
@@ -352,13 +380,51 @@ void statusCycle(unsigned char r, unsigned char g, unsigned char b) {
 	statuslights->draw();
 #endif
 
-#ifdef CYCLE_EYES
+eyeCycle();
+
+}
+
+void eyeCycle() {
+  static int divider=0;
+  int maxdiv=CYCLE_DIVIDER;
+
+  divider++;
+  if(divider > maxdiv) {
+    divider=0;
+   update_cycle();
+  }
+}
+
+void cycle_null() {
+}
+
+void cycle_colour() {
+	static int divider=0;
+	divider++;
+	if(divider < rainbowspeed/4) {
+		return;
+	}
+	divider=0;
+
 	eyeColour = wheel.update();
 	updateR=true;
 	drawEyeR();
-#endif
-
 }
+
+void cycle_rainbow() {
+	static int divider=0;
+	divider++;
+	if(divider < rainbowspeed) {
+		return;
+	}
+	divider=0;
+
+	rainbow_offset++;
+	rainbow_offset &= 0x0f;
+	updateR=true;
+	drawEyeR();
+}
+
 
 //
 //	Patch the sprite set at runtime.

@@ -28,3 +28,9 @@ struct EXPRESSIONS {
 #define FAULT 6
 #define OWO 7
 #define HAPPY 8
+
+// Draw modes
+
+#define DRAWMODE_NORMAL 0
+#define DRAWMODE_RAINBOW_H 1
+#define DRAWMODE_RAINBOW_V 2

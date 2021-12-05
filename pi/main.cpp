@@ -24,17 +24,17 @@
 // SynthOS 1.04
 PanelBitmap initimg = {
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-    0b11110101, 0b10111101, 0b11110101, 0b10111101, 
+    0b11010101, 0b10111101, 0b11010101, 0b10111101, 
     0b10010101, 0b01010101, 0b10010101, 0b01010101, 
     0b11010101, 0b01010111, 0b11010101, 0b01010111, 
     0b01001001, 0b01010101, 0b01001001, 0b01010101, 
     0b11001001, 0b01010101, 0b11001001, 0b01010101, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-    0b10100100, 0b00100101, 0b10100100, 0b00100101, 
-    0b10101100, 0b01010101, 0b10101100, 0b01010101, 
-    0b10100100, 0b01010111, 0b10100100, 0b01010111, 
+    0b10100100, 0b00100111, 0b10100100, 0b00100111, 
+    0b10101100, 0b01010100, 0b10101100, 0b01010100, 
+    0b10100100, 0b01010110, 0b10100100, 0b01010110, 
     0b10100100, 0b01010001, 0b10100100, 0b01010001, 
-    0b01000101, 0b00100001, 0b01000101, 0b00100001, 
+    0b01000101, 0b00100110, 0b01000101, 0b00100110, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
     0b00001101, 0b10101000, 0b01010111, 0b11010111, 
     0b00001001, 0b00101000, 0b00100101, 0b01010010, 
@@ -87,7 +87,8 @@ static EXPRESSIONS *forceExpression = NULL;
 int LED_PIN = 0;
 int ACK_COUNT = ACK_COUNT_DEFAULT;
 int COOLOFF_COUNT = COOLOFF_DEFAULT;
-
+extern int drawmode;
+extern int rainbow_offset;
 uint32_t eyeColour = (EYECOLOUR_RED<<16)|(EYECOLOUR_GREEN<<8)|EYECOLOUR_BLUE;
 uint32_t cheekColour = (BLUSHCOLOUR_RED<<16)|(BLUSHCOLOUR_GREEN<<8)|BLUSHCOLOUR_BLUE;
 
@@ -224,7 +225,15 @@ void drawEyeR() {
 	vfb[row][2]=*ptr++;
 	vfb[row][3]=*ptr++;
 	}
-  panel->update(vfb, eyeColour);
+  if(!drawmode) {
+	  panel->update(vfb, eyeColour);
+  } else {
+	if(drawmode == DRAWMODE_RAINBOW_V) {
+	  panel->update_rainbowV(vfb, rainbow_offset);
+	} else {
+	  panel->update_rainbowH(vfb, rainbow_offset);
+	}
+  }
 
   memset(blushfb,0,64);
 
@@ -233,7 +242,7 @@ void drawEyeR() {
 	blushfb[row][2]=*ptr++;
 	blushfb[row][3]=*ptr++;
 	}
-  panel->update(vfb, eyeColour);
+//  panel->update(vfb, eyeColour);
   panel->overdub(blushfb, cheekColour);
 
   panel->draw();
