@@ -13,6 +13,8 @@
 #include "hardware/gpio.h"
 #include "hub75.pio.h"
 
+extern uint32_t rainbow[16]; // Colour table
+
 //
 //	Init the PIO programs.
 //	This is based on code from the Pico HUB75 example.
@@ -69,6 +71,77 @@ void Hub08::update(PanelBitmap imgbitmap, uint32_t colour) {
 
 	for(int h=0;h<BITMAP_HEIGHT;h++)	{
 		ptr = imgbitmap[h];
+
+		// First panel
+		for(ctr=0;ctr<wd8;ctr++) {
+			pixels = *ptr++;
+			for(ctr2=0;ctr2<8;ctr2++) {
+				*buffer++ = (pixels & 128) ? colour : 0;
+				pixels <<= 1;
+			}
+		}
+
+		// Second panel (mirrored)
+		for(ctr=0;ctr<wd8;ctr++) {
+			pixels = *(--ptr);
+			for(ctr2=0;ctr2<8;ctr2++) {
+				*buffer++ = (pixels & 1) ? colour : 0;
+				pixels >>= 1;
+			}
+		}
+	}
+}
+
+void Hub08::update_rainbowH(PanelBitmap imgbitmap, int offset) {
+	uint32_t *buffer = framebuffer[0];
+	unsigned char *ptr, pixels;
+	uint32_t colour,index,xpos;
+	int ctr,ctr2,wd8=BITMAP_WIDTH/16; // width divided by 8, but divided by 2 for 2 panels (e.g. divided by 16)
+
+	for(int h=0;h<BITMAP_HEIGHT;h++)	{
+		ptr = imgbitmap[h];
+
+		xpos=0;
+		// First panel
+		for(ctr=0;ctr<wd8;ctr++) {
+
+			index = (offset + xpos++)&0x0f;
+			colour=rainbow[index]&0xff;
+
+			pixels = *ptr++;
+			for(ctr2=0;ctr2<8;ctr2++) {
+				*buffer++ = (pixels & 128) ? colour : 0;
+				pixels <<= 1;
+			}
+		}
+
+		xpos=0;
+		// Second panel (mirrored)
+		for(ctr=0;ctr<wd8;ctr++) {
+
+			index = (offset + xpos++)&0x0f;
+			colour=rainbow[index]&0xff;
+
+			pixels = *(--ptr);
+			for(ctr2=0;ctr2<8;ctr2++) {
+				*buffer++ = (pixels & 1) ? colour : 0;
+				pixels >>= 1;
+			}
+		}
+	}
+}
+
+void Hub08::update_rainbowV(PanelBitmap imgbitmap, int offset) {
+	uint32_t *buffer = framebuffer[0];
+	unsigned char *ptr, pixels;
+	uint32_t colour,index;
+	int ctr,ctr2,wd8=BITMAP_WIDTH/16; // width divided by 8, but divided by 2 for 2 panels (e.g. divided by 16)
+
+	for(int h=0;h<BITMAP_HEIGHT;h++)	{
+		ptr = imgbitmap[h];
+
+		index = (offset + h)&0x0f;
+		colour=rainbow[index]&0xff;
 
 		// First panel
 		for(ctr=0;ctr<wd8;ctr++) {

@@ -16,6 +16,8 @@ class Hub08 : public PanelDriver {
 		void init();
 		void draw();
 		void update(PanelBitmap bitmap, uint32_t colour);
+		void update_rainbowH(PanelBitmap bitmap, int offset);
+		void update_rainbowV(PanelBitmap bitmap, int offset);
 		void update_nomirror(PanelBitmap bitmap, uint32_t colour);
 		void overdub(PanelBitmap bitmap, uint32_t colour);
 	private:
