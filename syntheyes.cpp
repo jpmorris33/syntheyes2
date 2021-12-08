@@ -29,6 +29,7 @@ Timing *timing;
 
 void initSynthEyes();
 void loopSynthEyes();
+void set_pattern(int pattern);
 extern void initPin(int pin);
 extern void setPin(int pin, bool state);
 extern uint32_t eyeColour;
@@ -80,6 +81,7 @@ int laststate=-1;
 int cooloff = 0;
 int ack=0;
 int drawmode=DRAWMODE_NORMAL;
+int drawpattern=PATTERN_V;
 bool cycle = false;
 int rainbow_offset=0;
 bool updateL=true;
@@ -97,6 +99,8 @@ EyeBitmap blushbuffer;
 // Rainbow effect
 uint32_t rainbow[16] = {0xff1700,0xff7200,0xffce00,0xe8ff00,0x79ff00,0x1fff00,0x00ff3d,0x00ff98,0x00fff4,0x00afff,0x0054ff,0x0800ff,0x6300ff,0xbe00ff,0xff00e4,0xff0089};
 int rainbowspeed = 10;
+
+#include "patterns.h"
 
 //
 //  Animation data
@@ -166,9 +170,11 @@ void initSynthEyes() {
   if(cycle) {
      update_cycle = cycle_colour;
   }
-  if(drawmode == DRAWMODE_RAINBOW_H || drawmode == DRAWMODE_RAINBOW_V) {
+  if(drawmode == DRAWMODE_RAINBOW) {
      update_cycle = cycle_rainbow;
   }
+
+  set_pattern(drawpattern);
 
 
   // Initial draw
@@ -401,7 +407,7 @@ void cycle_null() {
 void cycle_colour() {
 	static int divider=0;
 	divider++;
-	if(divider < rainbowspeed/4) {
+	if(divider < rainbowspeed) {
 		return;
 	}
 	divider=0;
@@ -469,3 +475,17 @@ bool patch_raptorsden() {
 	return true;
 }
 
+
+void set_pattern(int pattern) {
+	switch(pattern) {
+		case PATTERN_H:
+			panel->set_pattern(pattern_h);
+			break;
+		case PATTERN_O:
+			panel->set_pattern(pattern_o);
+			break;
+		default:
+			panel->set_pattern(pattern_v);
+			break;
+	}
+}

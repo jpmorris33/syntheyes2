@@ -34,7 +34,9 @@ extern int COOLOFF_COUNT;
 extern uint32_t eyeColour;
 extern uint32_t cheekColour;
 extern int drawmode;
+extern int drawpattern;
 extern bool cycle;
+extern bool forcetransmitter;
 extern int rainbowspeed;
 
 extern int mapPin(int pin);
@@ -167,6 +169,14 @@ if(!strcasecmp(cmd,"serial:")) {
 	strncpy(serialPort,buf2,128);
 	serialPort[127]=0;
 }
+if(!strcasecmp(cmd,"transmitter:")) {
+	strcpy(buf2,param);
+	nextWord(buf2);
+
+	if(!strcasecmp(buf2,"true")) {
+		forcetransmitter=true;
+	}
+}
 if(!strcasecmp(cmd,"effect:")) {
 	strcpy(buf2,param);
 	nextWord(buf2);
@@ -178,12 +188,20 @@ if(!strcasecmp(cmd,"effect:")) {
 
 	if(!strcasecmp(buf2,"rainbow_v")) {
 		printf("Eye will have a vertical rainbow effect\n");
-		drawmode = DRAWMODE_RAINBOW_V;
+		drawmode = DRAWMODE_RAINBOW;
+		drawpattern = PATTERN_V;
 	}
 
 	if(!strcasecmp(buf2,"rainbow_h")) {
 		printf("Eye will have a horizontal rainbow effect\n");
-		drawmode = DRAWMODE_RAINBOW_H;
+		drawmode = DRAWMODE_RAINBOW;
+		drawpattern = PATTERN_H;
+	}
+
+	if(!strcasecmp(buf2,"rainbow_o")) {
+		printf("Eye will have a square rainbow effect\n");
+		drawmode = DRAWMODE_RAINBOW;
+		drawpattern = PATTERN_O;
 	}
 }
 if(!strcasecmp(cmd,"rainbowspeed:")) {

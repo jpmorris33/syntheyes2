@@ -32,5 +32,10 @@ struct EXPRESSIONS {
 // Draw modes
 
 #define DRAWMODE_NORMAL 0
-#define DRAWMODE_RAINBOW_H 1
-#define DRAWMODE_RAINBOW_V 2
+#define DRAWMODE_RAINBOW 1
+
+// Rainbow patterns
+
+#define PATTERN_V 0
+#define PATTERN_H 1
+#define PATTERN_O 2

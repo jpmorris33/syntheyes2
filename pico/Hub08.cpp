@@ -14,6 +14,7 @@
 #include "hub75.pio.h"
 
 extern uint32_t rainbow[16]; // Colour table
+static unsigned char rainbowpattern[16][16];
 
 //
 //	Init the PIO programs.
@@ -92,12 +93,13 @@ void Hub08::update(PanelBitmap imgbitmap, uint32_t colour) {
 	}
 }
 
-void Hub08::update_rainbowH(PanelBitmap imgbitmap, int offset) {
+void Hub08::update_patterned(PanelBitmap imgbitmap, int offset) {
 	uint32_t *buffer = framebuffer[0];
 	unsigned char *ptr, pixels;
-	uint32_t colour,index,xpos;
+	uint32_t colour,index,xpos,ypos;
 	int ctr,ctr2,wd8=BITMAP_WIDTH/16; // width divided by 8, but divided by 2 for 2 panels (e.g. divided by 16)
 
+	ypos=0;
 	for(int h=0;h<BITMAP_HEIGHT;h++)	{
 		ptr = imgbitmap[h];
 
@@ -105,8 +107,10 @@ void Hub08::update_rainbowH(PanelBitmap imgbitmap, int offset) {
 		// First panel
 		for(ctr=0;ctr<wd8;ctr++) {
 
-			index = (offset + xpos++)&0x0f;
+			index = (offset + (rainbowpattern[ypos][xpos]&0x0f))&0x0f;
 			colour=rainbow[index]&0xff;
+			xpos++;
+			xpos &= 0x0f; // Constrain to 16 pixels
 
 			pixels = *ptr++;
 			for(ctr2=0;ctr2<8;ctr2++) {
@@ -119,8 +123,10 @@ void Hub08::update_rainbowH(PanelBitmap imgbitmap, int offset) {
 		// Second panel (mirrored)
 		for(ctr=0;ctr<wd8;ctr++) {
 
-			index = (offset + xpos++)&0x0f;
+			index = (offset + (rainbowpattern[ypos][xpos]&0x0f))&0x0f;
 			colour=rainbow[index]&0xff;
+			xpos++;
+			xpos &= 0x0f; // Constrain to 16 pixels
 
 			pixels = *(--ptr);
 			for(ctr2=0;ctr2<8;ctr2++) {
@@ -128,38 +134,9 @@ void Hub08::update_rainbowH(PanelBitmap imgbitmap, int offset) {
 				pixels >>= 1;
 			}
 		}
-	}
-}
 
-void Hub08::update_rainbowV(PanelBitmap imgbitmap, int offset) {
-	uint32_t *buffer = framebuffer[0];
-	unsigned char *ptr, pixels;
-	uint32_t colour,index;
-	int ctr,ctr2,wd8=BITMAP_WIDTH/16; // width divided by 8, but divided by 2 for 2 panels (e.g. divided by 16)
-
-	for(int h=0;h<BITMAP_HEIGHT;h++)	{
-		ptr = imgbitmap[h];
-
-		index = (offset + h)&0x0f;
-		colour=rainbow[index]&0xff;
-
-		// First panel
-		for(ctr=0;ctr<wd8;ctr++) {
-			pixels = *ptr++;
-			for(ctr2=0;ctr2<8;ctr2++) {
-				*buffer++ = (pixels & 128) ? colour : 0;
-				pixels <<= 1;
-			}
-		}
-
-		// Second panel (mirrored)
-		for(ctr=0;ctr<wd8;ctr++) {
-			pixels = *(--ptr);
-			for(ctr2=0;ctr2<8;ctr2++) {
-				*buffer++ = (pixels & 1) ? colour : 0;
-				pixels >>= 1;
-			}
-		}
+		ypos++;
+		ypos &= 0x0f; // Constrain to 16 pixels
 	}
 }
 
@@ -230,4 +207,11 @@ void Hub08::overdub(PanelBitmap imgbitmap, uint32_t colour) {
 			}
 		}
 	}
+}
+
+//
+//	Set the special effect pattern
+//
+void Hub08::set_pattern(unsigned char pattern[16][16]) {
+	memcpy(rainbowpattern, pattern, 16*16);
 }

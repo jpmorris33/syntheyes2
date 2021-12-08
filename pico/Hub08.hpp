@@ -16,10 +16,10 @@ class Hub08 : public PanelDriver {
 		void init();
 		void draw();
 		void update(PanelBitmap bitmap, uint32_t colour);
-		void update_rainbowH(PanelBitmap bitmap, int offset);
-		void update_rainbowV(PanelBitmap bitmap, int offset);
+		void update_patterned(PanelBitmap bitmap, int offset);
 		void update_nomirror(PanelBitmap bitmap, uint32_t colour);
 		void overdub(PanelBitmap bitmap, uint32_t colour);
+		void set_pattern(unsigned char pattern[16][16]);
 	private:
 		PIO pio;
 		uint sm_data;

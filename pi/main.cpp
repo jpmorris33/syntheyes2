@@ -21,7 +21,7 @@
 #include "eyeconfig.h"
 
 
-// SynthOS 1.04
+// SynthOS 1.06
 PanelBitmap initimg = {
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
     0b11010101, 0b10111101, 0b11010101, 0b10111101, 
@@ -30,11 +30,11 @@ PanelBitmap initimg = {
     0b01001001, 0b01010101, 0b01001001, 0b01010101, 
     0b11001001, 0b01010101, 0b11001001, 0b01010101, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-    0b10100100, 0b00100111, 0b10100100, 0b00100111, 
+    0b10100100, 0b00100111, 0b10100100, 0b00100011, 
     0b10101100, 0b01010100, 0b10101100, 0b01010100, 
     0b10100100, 0b01010110, 0b10100100, 0b01010110, 
-    0b10100100, 0b01010001, 0b10100100, 0b01010001, 
-    0b01000101, 0b00100110, 0b01000101, 0b00100110, 
+    0b10100100, 0b01010101, 0b10100100, 0b01010101, 
+    0b01000101, 0b00100010, 0b01000101, 0b00100010, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
     0b00001101, 0b10101000, 0b01010111, 0b11010111, 
     0b00001001, 0b00101000, 0b00100101, 0b01010010, 
@@ -94,6 +94,7 @@ uint32_t cheekColour = (BLUSHCOLOUR_RED<<16)|(BLUSHCOLOUR_GREEN<<8)|BLUSHCOLOUR_
 
 int serialfd;
 bool transmitter = true;
+bool forcetransmitter = false;
 
 int main(int argc, char *argv[]) {
 	FILE *fp;
@@ -153,6 +154,11 @@ int main(int argc, char *argv[]) {
 			forceExpression = getExpression(argv[2]);
 
 		}
+	}
+
+	if(forcetransmitter) {
+		printf("Forcing into transmitter mode by config file\n");
+		transmitter=true;
 	}
 
 	printf("Opening serial port '%s'\n", serialPort);
@@ -228,10 +234,10 @@ void drawEyeR() {
   if(!drawmode) {
 	  panel->update(vfb, eyeColour);
   } else {
-	if(drawmode == DRAWMODE_RAINBOW_V) {
-	  panel->update_rainbowV(vfb, rainbow_offset);
+	if(drawmode == DRAWMODE_RAINBOW) {
+	  panel->update_patterned(vfb, rainbow_offset);
 	} else {
-	  panel->update_rainbowH(vfb, rainbow_offset);
+	  panel->update(vfb, eyeColour);
 	}
   }
 

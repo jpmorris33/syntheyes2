@@ -81,4 +81,6 @@ V1.05 - Add new rainbow and colour cycle effects (experimental, not tested on Pi
                 rainbowspeed: 10
         ...10 is the default.  Larger numbers will slow it down, smaller numbers will speed it up but increase the risk of glitching
 
-		
+V1.06 - Fix display glitches, hopefully for good
+        Rewrote effects engine to use patterns
+        Added new effect: rainbow_o		
