@@ -1,29 +1,62 @@
 /**
- * Dummy unicorn panel driver with no SPI transfer
+ * Dummy unicorn panel driver with SDL output for testing
  */
+
+#include <SDL2/SDL.h>
 
 #include "Unicorn.hpp"
 
 #include <stdio.h>
 #include <string.h>
 
-unsigned char spioutputbuf[769];
+static SDL_Window *win;
+static SDL_Renderer *renderer;
+static SDL_Texture *texture;
+
+static unsigned char outbuf[768];
 
 //
 //	Init the Unicorn HD driver
 //
 void Unicorn::init() {
+
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS);
+
+	win = SDL_CreateWindow("",0,0,160,160,SDL_WINDOW_RESIZABLE);
+
+	if (!win){
+		printf("Failed to open window: %s\n", SDL_GetError());
+		exit(1);
+	}
+
+	renderer = SDL_CreateRenderer(win, -1, 0);
+	if (!renderer){
+		fprintf(stderr, "Count not open renderer, aborting\n");
+		exit(1);
+	}
+
+	texture = SDL_CreateTexture(renderer,SDL_PIXELFORMAT_BGR24,SDL_TEXTUREACCESS_STREAMING,16,16);
+	if (!texture){
+		fprintf(stderr, "Failed to create texture\n");
+		exit(1);
+	}
+
+	SDL_SetRenderDrawColor( renderer, 0, 0, 0, SDL_ALPHA_OPAQUE );
+	SDL_RenderClear( renderer );
 }
 
 //
 //	Put the framebuffer onto the Unicorn HD panel
 //
 void Unicorn::draw() {
-	unsigned char *inptr = &framebuffer[0];
-	unsigned char *outptr = &spioutputbuf[0];
-	*outptr++=0x72;   // for addressing multiple panels, it's 0x73 + zero-based panel address
 
-	int windowwidth = EYE_WIDTH * 3;	// 16 RGB triplets
+	int w, h;
+	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+
+	unsigned char *inptr = &framebuffer[0];
+	unsigned char *outptr = &outbuf[0];
+
+	int windowwidth = 16 * 3;	// 16 RGB triplets
 
 	for(int ctr=0;ctr<BITMAP_HEIGHT;ctr++)  {
 		// Physical panel is only half the width of the virtual panel
@@ -38,6 +71,11 @@ void Unicorn::draw() {
 
 		inptr += windowwidth; 			// Skip the second half
 	}
+
+    SDL_UpdateTexture(texture, NULL, &outbuf[0], windowwidth);
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    SDL_RenderPresent(renderer);
+
 }
 
 //

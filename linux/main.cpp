@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <SDL2/SDL.h>
 #include "../inttype.h"
 
 #include "../syntheyes.hpp"
@@ -21,21 +22,21 @@
 // SynthOS 1.06
 PanelBitmap initimg = {
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-    0b11101010, 0b11101011, 0b10101011, 0b10111000, 
-    0b10001010, 0b10101001, 0b00101010, 0b10100000, 
-    0b01001110, 0b10101001, 0b00111010, 0b10111000, 
-    0b00100100, 0b10101001, 0b00101010, 0b10001000, 
-    0b11100100, 0b10111001, 0b00101011, 0b10111000, 
+    0b11010101, 0b10111101, 0b11010101, 0b10111101, 
+    0b10010101, 0b01010101, 0b10010101, 0b01010101, 
+    0b11010101, 0b01010111, 0b11010101, 0b01010111, 
+    0b01001001, 0b01010101, 0b01001001, 0b01010101, 
+    0b11001001, 0b01010101, 0b11001001, 0b01010101, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-    0b00001000, 0b00000000, 0b00111100, 0b00111000, 
-    0b00011000, 0b00000000, 0b01000010, 0b01000000, 
-    0b00101000, 0b00000000, 0b01000010, 0b01000000, 
-    0b00001000, 0b00000000, 0b01000010, 0b01111000, 
-    0b00001000, 0b00000000, 0b01000010, 0b01000100, 
-    0b00001000, 0b00110000, 0b01000010, 0b01000100, 
-    0b00111100, 0b00110000, 0b00111100, 0b00111000, 
+    0b10100100, 0b00100111, 0b10100100, 0b00100011, 
+    0b10101100, 0b01010100, 0b10101100, 0b01010100, 
+    0b10100100, 0b01010110, 0b10100100, 0b01010110, 
+    0b10100100, 0b01010101, 0b10100100, 0b01010101, 
+    0b01000101, 0b00100010, 0b01000101, 0b00100010, 
     0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-    0b00000000, 0b00000000, 0b00000000, 0b00000000, 
+    0b00001101, 0b10101000, 0b01010111, 0b11010111, 
+    0b00001001, 0b00101000, 0b00100101, 0b01010010, 
+    0b00001001, 0b10010000, 0b01010100, 0b01010010, 
 };
 
 extern PanelDriver *panel;
@@ -55,6 +56,8 @@ extern EyeBitmap blushbuffer;
 extern bool updateL;
 extern bool updateR;
 bool transmitter = false;
+bool forcetransmitter = false;
+static EXPRESSIONS *forceExpression = NULL;
 
 int LED_PIN = 0;
 int ACK_COUNT = ACK_COUNT_DEFAULT;
@@ -65,6 +68,8 @@ uint32_t cheekColour = (BLUSHCOLOUR_BLUE<<16)|(BLUSHCOLOUR_GREEN<<8)|BLUSHCOLOUR
 
 
 int main(int argc, char *argv[]) {
+	FILE *fp;
+
 	panel = new Unicorn();
 	panel->init();
 
@@ -79,17 +84,44 @@ int main(int argc, char *argv[]) {
 	adc->init(VOICE_PIN);
 #endif
 
-	if(argc > 1) {
-		FILE *fp = fopen(argv[1],"r");
-		if(!fp) {
-			printf("Could not open config file '%s'\n",argv[1]);
-			exit(1);
-		}
+	fp=fopen("./eyeconfig.txt","r");
+	if(fp) {
 		readConfig(fp);
 		fclose(fp);
 	}
 
 	initSynthEyes();
+
+	if(argc > 1) {
+		if(!strcmp(argv[1],"receiver")) {
+			transmitter=false;
+		}
+		if(!strcmp(argv[1],"transmitter")) {
+			transmitter=true;
+		}
+		// Switch off the display (for testing)
+		if(!strcmp(argv[1],"off")) {
+			panel->update_nomirror(initimg, 0);
+			timing->wait_microseconds(100000);
+			panel->draw();
+			timing->wait_microseconds(100000);
+			exit(0);
+		}
+		if(!strcmp(argv[1],"eyecolour") && argc > 2) {
+			eyeColour = parseColour(argv[2]);
+
+		}
+		if(!strcmp(argv[1],"test") && argc > 2) {
+			forceExpression = getExpression(argv[2]);
+
+		}
+	}
+
+	if(forcetransmitter) {
+		printf("Forcing into transmitter mode by config file\n");
+		transmitter=true;
+	}
+
 
 	panel->update_nomirror(initimg, 0x808080);
 	for(int ctr=0;ctr<2000;ctr++) {
@@ -178,9 +210,24 @@ void transmit(char code) {
 //
 
 bool checkExpression(STATES *state) {
+
+    if(forceExpression && forceExpression->id == state->id) {
+        return true;
+    }
+
     if(!state->pin) {
         return false;
     }
+
+	SDL_PumpEvents();
+	const unsigned char *keys = SDL_GetKeyboardState(NULL);
+	if (keys[SDL_SCANCODE_A + (state->code-'A')]) {
+		return true;
+	}
+	if(keys[SDL_SCANCODE_ESCAPE]) {
+		exit(1);
+	}
+
     return false;
 //    return !digitalRead(pin);
 }

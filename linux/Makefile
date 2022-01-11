@@ -6,7 +6,7 @@ INCLUDE	= -I/usr/local/include -I.
 CFLAGS	= $(DEBUG) -DPLATFORM_LINUX -Wall $(INCLUDE) -Winline -pipe
 
 LDFLAGS	= -L/usr/local/lib
-LDLIBS    = -lpthread -lm
+LDLIBS    = -lpthread -lm -lSDL2
 
 SRC	= main.cpp Unicorn.cpp ../syntheyes.cpp ../ColourWheel.cpp ../NeopixelDriver.cpp ../PosixTiming.cpp ../MicDriver.cpp ../Timing.cpp ../PanelDriver.cpp ../config.cpp
 
