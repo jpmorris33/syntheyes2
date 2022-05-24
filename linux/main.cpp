@@ -19,25 +19,6 @@
 
 #include "eyeconfig.h"
 
-// SynthOS 1.06
-PanelBitmap initimg = {
-    0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-    0b11010101, 0b10111101, 0b11010101, 0b10111101, 
-    0b10010101, 0b01010101, 0b10010101, 0b01010101, 
-    0b11010101, 0b01010111, 0b11010101, 0b01010111, 
-    0b01001001, 0b01010101, 0b01001001, 0b01010101, 
-    0b11001001, 0b01010101, 0b11001001, 0b01010101, 
-    0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-    0b10100100, 0b00100111, 0b10100100, 0b00100011, 
-    0b10101100, 0b01010100, 0b10101100, 0b01010100, 
-    0b10100100, 0b01010110, 0b10100100, 0b01010110, 
-    0b10100100, 0b01010101, 0b10100100, 0b01010101, 
-    0b01000101, 0b00100010, 0b01000101, 0b00100010, 
-    0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-    0b00001101, 0b10101000, 0b01010111, 0b11010111, 
-    0b00001001, 0b00101000, 0b00100101, 0b01010010, 
-    0b00001001, 0b10010000, 0b01010100, 0b01010010, 
-};
 
 extern PanelDriver *panel;
 extern NeopixelDriver *statuslights;
@@ -66,6 +47,8 @@ int COOLOFF_COUNT = COOLOFF_DEFAULT;
 uint32_t eyeColour = (EYECOLOUR_BLUE<<16)|(EYECOLOUR_GREEN<<8)|EYECOLOUR_RED;
 uint32_t cheekColour = (BLUSHCOLOUR_BLUE<<16)|(BLUSHCOLOUR_GREEN<<8)|BLUSHCOLOUR_RED;
 
+extern void errormsg(const char *msg);
+extern void initFont();
 
 int main(int argc, char *argv[]) {
 	FILE *fp;
@@ -101,7 +84,9 @@ int main(int argc, char *argv[]) {
 		}
 		// Switch off the display (for testing)
 		if(!strcmp(argv[1],"off")) {
-			panel->update_nomirror(initimg, 0);
+			PanelBitmap blank;
+			memset(blank,0,sizeof(blank));
+			panel->update_nomirror(blank, 0);
 			timing->wait_microseconds(100000);
 			panel->draw();
 			timing->wait_microseconds(100000);
@@ -122,8 +107,8 @@ int main(int argc, char *argv[]) {
 		transmitter=true;
 	}
 
+	printVersion(SYNTHOS_VERSION, 5000);
 
-	panel->update_nomirror(initimg, 0x808080);
 	for(int ctr=0;ctr<2000;ctr++) {
 		panel->draw();
 		timing->wait_microseconds(1000);

@@ -39,8 +39,8 @@ extern bool transmitter;
 
 #define STATUSBRIGHT 100
 #define VOICEBRIGHT 255
-#define FRAME_IN_MS 20  // Delay per animation frame in milliseconds (20 default)
-#define WAIT_IN_MS  60  // Delay per tick in milliseconds when waiting to blink again (60 default)
+#define FRAME_IN_MS 30  // Delay per animation frame in milliseconds (20 default)
+#define WAIT_IN_MS  90  // Delay per tick in milliseconds when waiting to blink again (60 default)
 #define MIN_DELAY    5   // Minimum delay between blinks
 #define MAX_DELAY    250 // Maximum delay between blinks
 #define STATUS_DIVIDER 16  // This controls the speed of the status light chaser, bigger is slower
@@ -108,6 +108,7 @@ int rainbowspeed = 10;
 
 #include "images-xerian.h"
 #include "images-arthi.h"
+#include "images-arthi2.h"
 
 
 // Add any new animation triggers here
@@ -143,6 +144,9 @@ struct EXPRESSIONS expressionnames[] = {
 
 
 void initSynthEyes() {
+
+  initFont();
+
   eyeanim = &closeeye[0];
   overlayanim = NULL;
   eyemax = sizeof(closeeye);
@@ -471,6 +475,34 @@ bool patch_raptorsden() {
 	// Assume Arthi's sprite data is smaller than Xerian's
 	memcpy(eye,rd_eye,sizeof(rd_eye));
 	memcpy(overlay,rd_overlay,sizeof(rd_overlay));
+
+	return true;
+}
+
+#define PATCH_RAPTORSDEN2(a,b,c) patch_state(a,rd2_##b,sizeof(rd2_##b),c);
+
+bool patch_raptorsden2() {
+
+	if(sizeof(rd_eye) > sizeof(eye)) {
+		return false;
+	}
+	if(sizeof(rd_overlay) > sizeof(overlay)) {
+		return false;
+	}
+
+	PATCH_RAPTORSDEN2(BLINK,closeeye,NULL);
+	PATCH_RAPTORSDEN2(WINK,closeeye,NULL);
+	PATCH_RAPTORSDEN2(ROLLEYE,rolleye,NULL);
+	PATCH_RAPTORSDEN2(STARTLED,startled,NULL);
+	PATCH_RAPTORSDEN2(ANNOYED,annoyed,NULL);
+	PATCH_RAPTORSDEN2(BLUSHING,blushing,rd2_ovl_blushing);
+	PATCH_RAPTORSDEN2(OWO,owo,NULL);
+	PATCH_RAPTORSDEN2(FAULT,fault,rd2_ovl_fault);
+	PATCH_RAPTORSDEN2(HAPPY,happy,NULL);
+
+	// Assume Arthi's sprite data is smaller than Xerian's
+	memcpy(eye,rd2_eye,sizeof(rd2_eye));
+	memcpy(overlay,rd2_overlay,sizeof(rd2_overlay));
 
 	return true;
 }

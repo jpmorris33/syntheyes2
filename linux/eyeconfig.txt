@@ -6,6 +6,6 @@ cheekcolour: #7f0002
 setPin: rolleye 30
 setPin: annoyed 32
 
-sprites: raptor
+sprites: raptor2
 transmitter: true
 

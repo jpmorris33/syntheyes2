@@ -1,3 +1,7 @@
+
+
+#define SYNTHOS_VERSION "1.07"
+
 //
 //  State structure
 //
@@ -15,6 +19,10 @@ struct EXPRESSIONS {
   const char *name;
   int id;
 };
+
+extern void errormsg(const char *msg);
+extern void initFont();
+extern void printVersion(const char *version, int duration);
 
 // System state variables
 

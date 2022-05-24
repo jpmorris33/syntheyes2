@@ -84,3 +84,7 @@ V1.05 - Add new rainbow and colour cycle effects (experimental, not tested on Pi
 V1.06 - Fix display glitches, hopefully for good
         Rewrote effects engine to use patterns
         Added new effect: rainbow_o		
+
+V1.07 - New sprite set with Raptors Den eyes raised 4 pixels
+	Use fonts for version number
+	Use fixed timing engine from V3

@@ -41,6 +41,7 @@ extern int rainbowspeed;
 
 extern int mapPin(int pin);
 extern bool patch_raptorsden();
+extern bool patch_raptorsden2();
 
 
 //
@@ -162,6 +163,14 @@ if(!strcasecmp(cmd,"sprites:")) {
 			printf("Error patching sprites\n");
 		}
 	}
+
+	if(!strcasecmp(buf2,"raptor2")) {
+		printf("Switching to the Raptor's Den sprite set\n");
+		if(!patch_raptorsden2()) {
+			printf("Error patching sprites\n");
+		}
+	}
+
 }
 if(!strcasecmp(cmd,"serial:")) {
 	strcpy(buf2,param);
@@ -208,7 +217,7 @@ if(!strcasecmp(cmd,"rainbowspeed:")) {
 	temp = atoi(param);
 	if(temp > 0 ) {
 		rainbowspeed = temp;
-		printf("Set rainbow delay to %d ticks\n",rainbowspeed);
+		printf("Set rainbow delay to %d ms\n",rainbowspeed);
 	}
 }
 
