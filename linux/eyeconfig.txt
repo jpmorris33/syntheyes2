@@ -8,4 +8,4 @@ setPin: annoyed 32
 
 sprites: raptor2
 transmitter: true
-
+#rotate180: true

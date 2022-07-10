@@ -88,3 +88,4 @@ V1.06 - Fix display glitches, hopefully for good
 V1.07 - New sprite set with Raptors Den eyes raised 4 pixels
 	Use fonts for version number
 	Use fixed timing engine from V3
+V1.08 - Add "rotate180: true" config option to rotate display

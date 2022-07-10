@@ -14,6 +14,7 @@
 
 unsigned char spioutputbuf[769];
 extern bool transmitter;
+extern bool rotated180;
 extern uint32_t rainbow[16]; // Colour table
 static PosixTiming refresh;
 static unsigned char rainbowpattern[16][16];
@@ -60,6 +61,10 @@ void Unicorn::draw() {
 			inptr += windowwidth;			// Jockey past the block we've just written
 			inptr += windowwidth; 			// Skip the second half of panel 2
 		}
+	}
+
+	if(rotated180) {
+		rotate180(&spioutputbuf[1],16,16);
 	}
 
 	// The panel gets fussy if it's updated more than about 60Hz

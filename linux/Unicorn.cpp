@@ -14,6 +14,7 @@ static SDL_Renderer *renderer;
 static SDL_Texture *texture;
 
 static unsigned char outbuf[768];
+extern bool rotated180;
 
 //
 //	Init the Unicorn HD driver
@@ -71,6 +72,11 @@ void Unicorn::draw() {
 
 		inptr += windowwidth; 			// Skip the second half
 	}
+
+	if(rotated180) {
+		rotate180(&outbuf[0],16,16);
+	}
+
 
     SDL_UpdateTexture(texture, NULL, &outbuf[0], windowwidth);
     SDL_RenderCopy(renderer, texture, NULL, NULL);

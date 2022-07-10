@@ -24,6 +24,7 @@ static char *nextWordEnd(char *input);
 STATES *getState(int id);
 EXPRESSIONS *getExpression(const char *expression);
 char serialPort[128];
+bool rotated180 = false;
 
 extern struct EXPRESSIONS expressionnames[];
 extern struct STATES states[];
@@ -184,6 +185,14 @@ if(!strcasecmp(cmd,"transmitter:")) {
 
 	if(!strcasecmp(buf2,"true")) {
 		forcetransmitter=true;
+	}
+}
+if(!strcasecmp(cmd,"rotate180:")) {
+	strcpy(buf2,param);
+	nextWord(buf2);
+
+	if(!strcasecmp(buf2,"true")) {
+		rotated180=true;
 	}
 }
 if(!strcasecmp(cmd,"effect:")) {

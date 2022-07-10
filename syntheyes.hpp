@@ -1,6 +1,6 @@
 
 
-#define SYNTHOS_VERSION "1.07"
+#define SYNTHOS_VERSION "1.08"
 
 //
 //  State structure

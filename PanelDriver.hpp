@@ -9,4 +9,5 @@ class PanelDriver {
 		virtual void update_nomirror(PanelBitmap bitmap, uint32_t colour);
 		virtual void overdub(PanelBitmap bitmap, uint32_t colour);
 		virtual void set_pattern(unsigned char pattern[16][16]);
+		virtual void rotate180(unsigned char *buffer, int w, int h);
 };
